@@ -1,0 +1,126 @@
+LOCKS:
+
+LOCK RESOURCES:
+ROW LEVEL: Row identifier used to lock a single row with in a table
+PAGE LEVEL: 8 kilo bytes (kb) data pages or index pages
+EXTENT LEVEL: Contiguous group of eight data pages or index pages
+TABLE LEVEL: Entire table including all data index
+DATABASE LEVEL: Database
+KEY LEVEL: row lock with in an index used to product key ranges in serializable transaction
+
+
+
+How to find locks:
+SP_LOCK
+OR
+SELECT * FROM SYS.DM_TRAN_LOCKS
+
+How will u find out which session is doing what work?
+SP_WHO2
+
+TYPES OF LOCKS:
+1. Shared lock[S]: Multiple users can able to read the data on specific resource. No transaction
+or query need to wait.
+> When transaction starts internally lock manager applies shared lock and once reading
+completed lock revoked automatically.
+2. Exclusive Lock[X]: When we perform any insert, update and delete operations then exclusive
+lock (X) placed on resource.
+> Always lock manager gives the priority to DML operations compare to any select queries.
+3. Update Lock [U]: Whenever we perform any update operations then update lock placed in
+SQL Server.
+> Update lock calls most of the time exclusive lock (X) by lock manager.
+
+
+BLOCKINGS:
+
+Blockings:
+> Blocking occurs when one SPID holds a lock on a specific resource and a second SPID attempts
+to acquire a conflicting lock type on the same resource.
+
+How to find blocking:
+Method 1: SP_WHO2
+Method 2: Select * from sys.sysprocesses where spid>50 and blocked<>0
+
+Method 3: Select * from sys.dm_os_waiting_tasks
+Method 4: Go to database > right click> reports> standard reports> all blocking sessions
+Method 5: By running the profiler > "ALL BLOCKED TRANSCATIONS"
+
+Solution:
+1. Check what is the spid causing the blocking in column "BLKBY” and find the queries which are
+relate to by using
+DBCC INPUTBUFFER (SPID) --- Display upto 250 char max.
+2. Share these spid and query information to apps guys and ask confirmation from their side to
+kill one of the SPID to resolve the blockings.
+3. Once apps team confirms then we will proceed for killing the spid. Ensure apps team send
+email but not verbally.
+4. Kill the session by using
+KILL SPID
+5. Ask apps team to check the query status and keep monitoring from DBA end.
+
+If blocking runs what is the IMPACT?
+- Application runs slowly and apps side queries take longer time
+- If blockings run long time then it may down the Sql server. ASAP inform after monitoring to
+apps team and kill after confirmation.
+
+
+How to avoid blockings in SQL SERVER:
+Long-running queries.
+Canceling queries without rollback
+Changing large numbers of records in a single transaction
+Lack of appropriate indexes
+Note: BLOCKING information never stores in error log or event viewer. We have to capture
+when blockings are running.
+
+
+DEAD LOCKS
+Deadlock: A deadlock occurs when two or more tasks permanently block each other by each
+task having a lock on a resource which the other tasks are trying to lock.
+ERROR: 1205 is the deadlock error number.
+Error message: Transaction (Process ID 55) was deadlocked on lock resources with another
+process and has been chosen as the deadlock victim.Rerun the transaction.
+
+Impact: If deadlock occurs it impact user queries\connections\application slowness\ and Sql
+server may down if long time deadlock runs
+How to find?
+Note: By default deadlock information never capture in SQL Server error log or event viewer or
+you cannot find by using any query or DMV's.
+We have to enable trace or run the profiler to capture the victim transactions for deadlocks
+
+
+Method: 1
+Enable DBCC TRACEON (1222, 1204,-1) then after automatically SQL Server captures deadlock
+transaction into SQL Server errorlogs.
+1222: Output in text formate
+1204: Output in XML formate
+-1: Global Trace it will check the all the data bases.
+
+
+How to find how many Traces?
+DBCC TRACESTATUS
+Method 2:
+To run the Profiler what permission need to require?
+Sysadmin
+Run the profiler by selecting the events
+> LOCK: DEADLOCK CHAIN
+> LOCK: DEADLOCK
+> LOCK: DEADLOCK GRAPH
+Once run then automatically deadlock transactions captured into profiler tool in a graph
+representation.
+> Lock will be created in Buffer Pool
+
+Solution: Deadlocks always kill or resolved by deadlock manager based on
+"DEADLOCK_PRIORITY” parameter gives which SPID need to kill.
+DEADLOCK_PRIORITY: It provides which transaction need to kill on basis below factors.
+>Which transaction takes less time to roll back?
+> When transaction started?
+> What type of statement which is?
+Pass the final information to dead lock manager and kills victim transaction to fix deadlock
+
+How to minimize deadlocks:
+1. Keep transactions as short as possible.
+2. During transactions, don't allow any user input.
+3. Avoid cursors.
+4. Consider using the NOLOCK hint to prevent locking.
+Select query always with no_lock
+No_Lock: It will never keep shared lock
+5. Access objects in the same order
