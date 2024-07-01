@@ -1,0 +1,13 @@
+> By default, the query optimizer already updates statistics as necessary to improve the query
+plan in some cases you can improve query performance by using UPDATE STATISTICS
+> Updating statistics ensures that queries compile with up-to-date statistics. However, updating
+statistics causes queries to recompile. We recommend not updating statistics too frequently
+because there is a performance tradeoff between improving query plans and the time it takes
+to recompile queries
+
+Note:
+1. Update statistics is the one of the DBA Maintaince activity and runs every day after business
+hours.
+2. After rebuild index no need to perform again update statistics. Why because whenever index
+runs automatically Update statistics also gets updated.
+3. Whenever create any index, always first create STATISTICS and the create indexes.
