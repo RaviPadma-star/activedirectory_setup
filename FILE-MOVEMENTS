@@ -1,0 +1,39 @@
+File movement activities: [.MDF, .LDF & .NDF]
+1. File move will applicable for both user and system databases.
+USER DATABASE STEPS:
+Pre-Activity: Take full database backup before performing any changes on your SQL Server
+instance.
+1. Collect logical file names for your databases [User and system]
+sp_helpfile
+2. Update the logical name for user database by using alter command with new path
+
+
+Alter database dbname modify file (name='logical file name', filename='newpath') -----Data file
+Alter database dbname modify file (name='logical file name', filename='newpath') -----log file
+
+
+Note: Verify whether logical name is updated with new path by using sp_helpfile again...
+
+
+3. Take database offline. [Kill the session if any active sessions are running on the database
+before taking your user database offline]
+
+4. Move physical files to new path and bring the user database online.
+
+Note: While moving physical .mdf, .ldf, .ndf files use always copy & paste method but not cut
+and paste.
+5. Sp_helpfile
+Note: When performing user database file movement only required to take database offline but
+not SQL Server services offline
+
+Note: Ask application team to check the connectivity of the database and once received
+confirmation from application team then only delete the older files from physical location.
+
+Note: After completing the file movement go and clear the older files from directory by using
+SHIFT+DELETE but not delete ...since if you use delete next go to recycle bin folder if space is
+not there in C:\ drive then server becomes hung state. More risk is involve
+--------------------------------------------------------------------------------------------------------------
+
+To see list of file for all databases:
+Select * from sys.sysaltfiles
+
