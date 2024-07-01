@@ -1,0 +1,31 @@
+Existing indexes dropped after recreating newly with same name and on same
+columns. At the time index recreation automatically data gets rearranged.
+Alter INDEX INDEXNAME ON TABELNAME REBUILD
+Note: When you are creating index\rebuild\reorganize the table loaded into TEMPDB system
+database and then perform the operations. If Tempdb disk does not have sufficient disk space
+then index may fail.
+In real time index Maintaince is a weekly Maintaince.
+Note: Upto SQL Server 2000 version rebuilding the index required down time due to table
+cannot be accessible to end users. [OFFLINE INDEXING]
+From SQL 2005 supports bot offline and online index....
+When rebuild index is running still table can be accessible by end users.
+Note: Rebuild or reorganize always performs at Tempdb. 120% of free space should require
+depends on the table size.
+If Tempdb drive space is less index fails
+
+MISSING INDEX: Which leads poor performance to particular query.
+How to find:
+Select * from sys.dm_db_missing_index_details
+
+
+UNUSED INDEXES: If indexes are not used they should be dropped as Indexes reduces the
+performance for INSERT/UPDATE statement. Indexes are only useful when used with SELECT
+statement.
+To find whether any unused indexes in SQL Server can get by DMV.
+Select * from sys.dm_db_index_usage_stats
+Note: if any UN unused indexes in SQL Server then we cannot get good performance. To use
+indexes drop existing indexes and recreate the same indexes.
+
+How to find SPID percentage completion or estimated time:
+Select * from sys.dm_exec_requests
+
