@@ -1,0 +1,80 @@
+[User db corruption]
+Suspect is a state where database becomes inaccessible due to different reasons
+
+Reasons:
+1) Data and Log files missing or corrupt
+2) Corruption of pages in the Data and Log files.
+3) Synchronization issues between data and log files
+4) Issues that are caused during Recovery/Restoring process
+5) Sudden shutdown happen to your database\instance...
+6) Kill spid while transaction is roll back...
+7) Database Flags in inactive status.
+
+
+Case 1: LDF File corruption
+
+Steps to Resolve:
+1) Identify if database is really in suspect state or not
+
+Select databasepropertyex ('dbname','status')
+
+2) Attempt to reset the suspect flag using sp_resetstatus  --> sp_resetstatus 'amershopdata'
+
+3) Set the EMERGENCY mode on for the database for further troubleshooting. Emergency mode
+is a READ_ONLY state and gives some base for identifying the cause of the issue.
+Alter database dbname set emergency
+
+4) Put database in Single User mode, to avoid connection conflicts.
+Alter database <Dbname> set Single_user with rollback immediate
+
+5) Run DBCC CHECKDB on the database to identify if the issue is with Data files or Log files.
+Running checkdb finds any consistency and allocation errors and if there are no errors found
+then Data file is considered to be clean. The issue might exist with Log file.
+
+Output should say:
+CHECKDB found 0 allocation errors and 0 consistency errors in database 'test'.
+6) Detach the database and delete log file from the path.
+sp_detach_db @dbname='dbname'
+
+7) After attach database by using below cmd:
+CREATE DATABASE databasename on
+(FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL.2\MSSQL\Data\databasename
+.mdf’) for attach
+Finally database come online with new ldf file.
+Inform apps team to test the data from their end.
+
+
+Case 2: If data file corrupt?
+Restore from recent backup file
+Note: If .mdf corrupt db will not go to emergency mode...
+
+Case 3: If page corrupt?
+Restore from recent backup file by using below cmd
+Restore database dbname page= (file id: pageid) from disk='backup file path'
+
+Note:
+[Late recovery Option: Client approval is required]
+If backup is not available and issues found with data file/log file use
+DBCC Checkdb ('dbname', REPAIR_ALLOW_DATA_LOSS)
+This command repairs the database but has the risk of data loss. Take proper approvals before
+performing this step.
+Note: Your system databases never go to suspect mode.
+
+Background about CHECK DB
+If you run checkdb what are the internal queries will execute?
+Checks the logical and physical integrity of all the objects in the specified database by
+performing the following operations:
+>> Runs DBCC CHECKALLOC on the database:: Checks the consistency of disk space allocation
+structures for a specified database.
+>> Runs DBCC CHECKTABLE on every table and view in the database::Checks the integrity of all
+the pages and structures that make up the table or indexed view.
+>> Runs DBCC CHECKCATALOG on the database::Checks for catalog consistency within the
+specified database. The database must be online.
+Note: IN SUSPECT MODE NOT POSSIBLE TO APPLY TAIL LOG BACKUP
+
+
+
+--------------------------------------Note: How to find estimated time for DBCC query?
+Select * from sys.dm_exec_requests
+Column: "Estimated_completion_time"
+-----------------------------------------------------------------
