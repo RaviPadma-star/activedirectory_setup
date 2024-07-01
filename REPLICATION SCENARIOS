@@ -1,0 +1,210 @@
+1. HOW MANY AGENTS ARE IN EACH TYPE OF REPLICATION?
+Snapshot Replication: Snapshot agent, distributor agent
+Transactional Replication: Snapshot agent, distributor agent, Log reader agent
+Transaction with updatable subscription: Snapshot agent, distributor agent, log reader, queue reader
+agent.
+Merge Replication: Snapshot agent, distributor agent, merge agent
+Peer to Peer Replication: Snapshot agent, distributor agent, and log reader agent [Per each peer or
+node]
+2. HOW TO ADD AND DELETE ARTICLE IN EXISTING REPLICATION? WHAT IS DIFF BETWEEN
+2000, 2005 AND 2008 ADDING ARTICLE PROCESS?
+Adding article
+
+1. Take full database backup for publisher database
+2. Take the scripts in publisher and subscriber for create and drop scripts.[Purpose: like a backup of
+existing replication configuration]
+3. After go to publisher >>>Publisher database properties>>and article>>and select that article.
+4. Renationalize the snap shot again from replication monitor: to replicate newly added article from
+publisher to subscriber
+
+
+Through query:
+SP_addartical [sp used to add article]
+
+Example: EXEC SP_addartical
+@publication = Pub_dbAmericasCitrixFarm,
+@article = Table_2,
+@source object = Table_2
+
+
+
+Removal of article:
+1. Take full database backup for publisher database
+2. Take the scripts in publisher and subscriber for create and drop scripts.
+3. After go to publisher >>>Publisher database properties>>and article>>and uncheck that
+article.
+4. Renationalize the snap shot again from replication monitor.
+Example:
+EXEC sp_dropsubscription
+@publication = Pub_dbAmericasCitrixFarm,
+@article = N'Table_2',
+@subscriber = 'FTDCCWPCTRXSQL';
+
+
+3. SCHEMA CHANGES IF WE DO ANY IMPACT TO SUBSCRIBER?
+If we perform any schema changes to the existing replicated article, then we need to re initialize
+snapshot from publisher one more time.
+
+
+4. REMOVAL OF REPLICATION?
+Method 1:
+Go to the publication >replication> "Disable publishing and distribution" option>click next and
+finish
+Automatically delete distribution database. After go to local publication delete publication and
+subscription from local subscriber.
+Method 2:
+Exec sp_droppublication ‘publication name’
+Exec sp_dropsubscription’subscriptoon name’
+
+
+5. DISTRIBUTION DATABASE REMOVAL AND IS IT POSSIBLE TO TAKE DISTRIBUTION DATABASE
+OFFLINE?
+Method 1: Go to distribution server>right click> disable publishing and distribution> remove
+distribution database.
+Method 2: Remove dependent publisher and subscriber
+After fire drop database distribution (at distribution server)
+
+
+6. DMV’S [DYNAMIC MANAGEMENT VIEW] USED FOR REPLICATION:
+1. Sys.dm_repl_articles: Returns information about database objects published as articles in a
+replication topology.
+2. Sys.dm_repl_schemas: Returns information about table columns published by replication.
+3. Sys.dm_repl_tranhash: Returns information about transactions being replicated in a
+transactional publication.
+4. Sys.dm_repl_traninfo: Returns information on each replicated or change data capture
+transaction.
+
+
+
+7. HOW TO PERFORM MONITORING IN REPLICATION?
+Undistributed commands: which displays how many commands or queries which are waiting to
+move from distribution database to subscriber. It will also displays how much take to replicate
+those commands from distributor to subscriber.
+Monitoring Areas: Replication monitor and replication Maintaince jobs
+Note: Verify \check the history whether data is moving from "Publisher to distributor" or
+"Distributor to subscriber" and check "undistributed command"
+Note: Perform regular index maintenance, update stats, reindex, on Replication system tables
+just like you do for user tables.
+MSmerge_contents
+MSmerge_genhistory
+MSmerge_tombstone
+MSmerge_current_partition_mappings
+MSmerge_past_partition_mappings
+
+
+8. WHAT ARE THE SP AND TRIGGERS ARE USED IN REPLICATION?
+Merge Replication:
+Store Procedures:
+dbo.MSmerge_del_sp_80FDDC450D814A6F4A371E97BB9A4ECC
+dbo.MSmerge_ins_sp_80FDDC450D814A6F4A371E97BB9A4ECC
+dbo.MSmerge_upd_sp_80FDDC450D814A6F4A371E97BB9A4ECC
+dbo.MSmerge_sel_sp_80FDDC450D814A6F4A371E97BB9A4ECC
+Triggers:
+MSmerge_del_EDE22551187F43A2A520C328D819CF51
+MSmerge_ins_EDE22551187F43A2A520C328D819CF51
+MSmerge_upd_EDE22551187F43A2A520C328D819CF51
+
+9. IF I CHANGE RECOVERY MODEL THEN IS THERE ANY IMPACT?
+> There will be no impact if we change recovery models due to replication support all type of
+recovery models.
+
+
+10. DIFF BETWEEN PUSH AND PULL?
+> Distributor agent resided in distribution server - Push type
+> Distributor agent resided in subscriber server- Pull Type
+11. CAN WE MODIFY DISTRIBUTION DATABASE DATA?
+Yes we can modify distribution database but it effect replication. Not recommended
+12. TRUNCATE TABLE IN PUBLISHER WILL IT’S EFFECT TO SUBSCRIBER?
+> Truncate is a non-logged operation and it will not replicate automatically from publisher to
+subscriber
+
+
+
+13. ERROR NUMBERS?
+14. PRIMARY KEY VIOLATION?
+PRIMARY KEY VIOLATION:
+Error messages:
+Violation of PRIMARY KEY constraint 'PK_tablename'. Cannot insert duplicate key in object
+'dbo.tablename'. (Source: MSSQLServer, Error number: 2627)
+
+
+Impact: This type of error generally appears in Transaction replication type.
+Replication sync gets fail if this error reported. data\transaction sends from publisher to
+distributor. But from distributor to subscriber it fails and report the error in transactional
+replication monitor.
+
+
+Where to find:
+> Go to replication monitor> All subscriptions column > Status column> double click> check the
+information from publisher to distributor and dist> sub
+> You can see error of primary key violation in dist to sub history.
+From the error:
+
+
+Transaction sequence no
+Command ID:
+Solution:
+1. First find what transaction is inserted into subscriber which is causing this error by using
+below commands and execute only on distribution database.
+EXEC Distribution. Sp_browsereplcmds
+@xact_seqno_start = ‘0x00000018000000A1000300000000’,
+@xact_seqno_end = '0x00000018000000A1000300000000',
+@command_id =1, @publisher_database_id = 1
+2. COMMAND with transaction: {CALL [sp_MSins_dboetab] (N'3 ', N’c ', N’ap ')}
+3. Delete manually from subscriber and monitor for some time.
+4. Now replication is working with excellent performance with no latency value.
+
+
+
+15. SHOULD I SCRIPT MY REPLICATION CONFIGURATION?
+Yes. Scripting the replication configuration is a key part of any disaster recovery plan for a
+replication topology
+
+
+16. WHY DOES REPLICATION ADD A COLUMN TO REPLICATED TABLES; WILL IT BE REMOVED IF
+THE TABLE ISN'T PUBLISHED?
+> Merge replication adds the column rowguid to every table, unless the table already has a
+column of data type unique identifier with the ROWGUIDCOL property set (in which case this
+column is used). If the table is dropped from the publication, the rowguid column is removed; if
+an existing column was used for tracking, the column is not removed.
+Rowguid column: added in merge
+MSrepl_tran_version: transactional updatable subscription
+
+17. CAN MULTIPLE PUBLICATIONS USE THE SAME DISTRIBUTION DATABASE?
+> Yes. There are no restrictions on the number or types of publications that can use the same
+distribution database. All publications from a given Publisher must use the same Distributor and
+distribution database.
+
+
+18. DOES REPLICATION ENCRYPT DATA?
+> No. Replication does not encrypt data that is stored in the database or transferred over the
+network
+
+19. WHY CAN'T I RUN TRUNCATE TABLE ON A PUBLISHED TABLE?
+> TRUNCATE TABLE is a non-logged operation that does not fire trigger
+
+
+20. IF I CHANGE RECOVERY MODEL THEN IS THERE ANY IMPACT?
+No
+
+21. HOW SNAPSHOT WILL BE TAKEN?
+> In SQL Server replication data transfer happen by using method of “BCP [BULK COPY
+PROGRAM] - for data, sch –for schema, Ind-for indexes move”
+
+
+22. CAN WE MODIFY DISTRIBUTION DATABASE DATA?
+> Yes we can modify the distribution database tables but not recommended...it will go to create
+impact.
+
+
+23. SCHEMA CHANGES IF WE DO ANY IMPACT TO SUBSCRIBER?
+Steps:
+> After schema changes in publisher article then we require to renationalize the snapshot agent
+to generate new snapshot
+> Go to subscriber and then renationalize to apply new snapshot into subscriber article.
+
+Note1: In peer –to-peer replication automatically schema change replicate to subscriber
+without snapshot agent run.
+Note2: If we run snapshot then only modified data changes replicate to subscriber
+
+
