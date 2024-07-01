@@ -1,0 +1,134 @@
+> DBCC commands are used to check the consistency of the database or database objects.
+While executing DBCC commands the DB engine creates a database snapshot and then runs the
+checks against this snapshot. After the DBCC command is completed, this snapshot is dropped.
+
+MAINTENANCE COMMANDS:
+Perform the maintenance tasks on a database, index, or filegroup.
+CLEANTABLE:
+> Reclaims space from dropped variable-length columns in tables or indexed views.
+DBCC CLEANTABLE (‘Database name’, ‘Table name’, size)
+
+
+DBREINDEX:
+> Rebuilds one or more indexes for a table in the specified database.
+DBCC DBREINDEX (‘Table name’, ‘Index name’, Fill factor)
+
+
+DROPCLEANBUFFERS:
+> Removes all clean buffers from the buffer pool.
+DBCC DROPCLEANBUFFERS
+
+FREEPROCCACHE:
+> Removes all elements from the plan cache, removes a specific plan from the plan cache by
+specifying a plan handle or SQL handle, or removes all cache entries associated with a specified
+resource pool.
+DBCC FREEPROCCACHE
+
+INDEXDEFRAG:
+> Defragments indexes of the specified table or view.
+DBCC INDEXDEFRAG (‘Database name’,’Table name’,’index name, partition number’)
+
+
+SHRINKDATABASE:
+> Shrinks the size of the data and log files in the specified database.
+DBCC SHRINKDATABASE (‘Database name’, target percentage)
+
+SHRINKFILE:
+> Shrinks the size of the specified data or log file for the current database, or empties a file by
+moving the data from the specified file to other files in the same filegroup, allowing the file to
+be removed from the database. You can shrink a file to a size that is less than the size specified
+when it was created. This resets the minimum file size to the new value.
+
+DBCC SHRINKFILE (‘File name’, target percentage)
+
+INFORMATIONAL COMMANDS:
+Performs tasks that gather and display various types of information.
+CONCURRENCYVIOLATION:
+> Is maintained for backward compatibility. It runs but returns no data.
+DBCC CONCURRENCYVIOLAION
+
+
+UPDATEUSAGE:
+
+> Reports and corrects pages and row count inaccuracies in the catalog views. These
+inaccuracies may cause incorrect space usage reports returned by the sp_spaceused system
+stored procedure.
+DBCC UPDATEUSAGE (‘Database name’)
+INPUTBUFFER:
+> Displays the last statement sent from a client to an instance of Microsoft SQL Server 2005.
+DBCC INPUTBUFFER (session id)
+
+
+OUTPUTBUFFER:
+> Returns the current output buffer in hexadecimal and ASCII format for the specified
+session_id.
+DBCC OUTPUTBUFFER (session id)
+PROCCACHE:
+> Displays information in a table format about the procedure cache.
+DBCC PROCCACHE
+SHOW_STATISTICS:
+> Displays the current distribution statistics for the specified target on the specified table.
+
+
+DBCC SHOW_STATISTICS (table or index view name’, target)
+
+SHOWCONTIG:
+> Displays fragmentation information for the data and indexes of the specified table or view.
+DBCC SHOWCONTIG (‘table name’)
+
+
+SQLPERF:
+> Provides the transaction log space usage statistics for all databases. It can also be used to
+reset wait and latch statistics.
+DBCC SQLPERF (LOGSPACE)
+
+TRACESTATUS:
+> Display the status of trace flags.
+DBCC TRACESTATUS (Trace number)
+
+
+USEROPTIONS:
+> Returns the SET options active (set) for the current connection.
+DBCC USEROPTIONS
+
+VALIDATION COMMANDS:
+> Performs validation operations on a database, table, index, catalog, filegroup, or allocation of
+database pages.
+CHECKALLOC:
+> Checks the consistency of disk space allocation structures for a specified database.
+DBCC CHECKALLOC (‘Database name’)
+
+CHECKCATALOG:
+> Checks for catalog consistency within the specified database.
+DBCC CHECKCATALOG (‘Database name’)
+
+
+CHECKCONSTRAINTS:
+> Checks the integrity of a specified constraint or all constraints on a specified table in the
+current database.
+DBCC CHECKCONSTRAINTS WITH ALL_CONSTRAINTS
+CHECKDB:
+> Checks the logical and physical integrity of all the objects in the specified database.
+DBCC CHECKDB (‘Database name)
+
+
+
+CHECKFILEGROUP:
+> Checks the allocation and structural integrity of all tables and indexed views in the specified
+filegroup of the current database.
+DBCC CHECKFILEGROUP FILEGROUPNAME
+CHECKIDENT:
+> Checks the current identity value for the specified table and, if it is needed, changes the
+identity value.
+DBCC CHECKIDENT (‘table_name’)
+
+CHECKTABLE:
+> Checks the integrity of all the pages and structures that make up the table or indexed view.
+DBCC CHECKTABLE (‘table_name’)
+
+
+
+
+
+
+
