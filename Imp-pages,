@@ -1,0 +1,378 @@
+. Collation settings: Nothing but language preference
+Default Collation for SQL Server: SQL_Latin1_General_CP1_CI_AS, SQL
+CP: Code page
+CI: Case in sensivity
+AS: Accent sensivity
+
+
+Database ID's:
+Master -1
+Model-3
+Msdb-4
+Tempdb- 2
+Resource-32767
+
+How to find how many instances are installed in server?
+NET START |FINDSTR -I SQL
+Note: SQL Server 2008 \R2 configuration manager show all SQL Server services for same and
+lower version of SQL as well
+But where as in Sql server 2005 configuration manager does not show 2008 \R2 or higher
+version services.
+
+
+How to bypass restart computer policy in Sql server and applying any sp?
+Go to REGEDIT> HKEY_LOCAL_MECHINE>SYSTEM>CONTROL>CURRENT CONTROL> SESSION
+MANAGE> "PENDING FILE RENAME OPERATIONS">>>
+Clear this file data and re run the checks.
+
+Service pack fails reasons:
+1. Missing or corruption of .MSI or .MSP files.
+2. Incompatibility issue
+3. Permission issue.
+4. Service pack media corrupted.
+1. Missing or corruption of .MSI OR .MSP f
+
+
+1. Missing or corruption of .MSI OR .MSP files:
+What is .MSI and .MSP files:
+A MSP (Microsoft Software Patch) is basically a set of transforms (modifications) against a
+baseline MSI (Microsoft Software Installer) file.
+Findings: From summery.txt file under hotfix folder
+Solution:
+> Extract from Sql server software.
+Process:
+Extraction process: Sql service pack 3 file for example is of the format ‘Sql server
+sp3-90000-setup.exe’ in E:\sqlbits directory, then navigate to this directory in command prompt
+and execute the command as below:
+Service pack directory>service pack file name /x
+X: means extract
+A dialog box will open requesting the location to extract the bits. Provide the location and press
+OK. SP3 bits will be extracted in the specified location.
+Or
+> Download the missing .msi or .msp file and place into C:\WINDOWS\INSTALLER
+Or
+> Copy from another same version of Sql server
+
+
+How take database offline\online?
+ALTER DATABASE [DBNAME] SET OFFLINE
+ALTER DATABASE [DBNAME] SET ONLINE
+
+How to find database status?
+Select * from sys.databases: show all databases
+Select* from sys.sysdabases: Only online databases
+
+FILES
+
+Types of files:
+.MDF [Master data file, main data file, primary data file]
+.NDF [Next data file, new data file, secondary data file]
+.LDF [Log data file]
+Purpose:
+1. .MDF:
+> This file is the startup of the database in Sql server/database...i.e. whenever you start Sql
+server database the first file comes online "MDF"
+> MDF contains other file information [.LDF and .NDF]
+> Per database only 1 MDF file and cannot possible to delete.
+2. .NDF:
+> When primary data file is full\depending on the requirement we can add multiple secondary
+files per each database.
+> Multiple secondary data files can add
+3. .LDF:
+> The main purpose this file to recover the data whenever any databases crashes.
+> At least 1 log file should contain per database
+> Every transaction should write first into LDF file and this concept is called as “WAL [WRITE A
+HEAD LOGGING]".
+> Log files extension always given as .LDF
+
+Note: per database we can be able to create 32767 file (.MDF, .NDF, .LDF)
+Data file size: [.MDF or .NDF] –16 TB
+Log file: .LDF –2TB
+Note:
+1. per database can create total max number of files can create 32767
+[Default: 1 MDF +1 LDF].
+32765 [Multiple NDF+ MULTIPLE LDF'S]
+2. The default MDF\NDF file size: 2 MB and LDF: 1 MB
+[Inherit all the properties from MODEL database]
+
+
+1. How to add a file by using query analyzer?
+ALTER DATABASE [DBNAME]
+ADD FILE
+(NAME='Logical name', Filename='path\physicalfilename.NDF OR LDF')
+To filegroup [FGNAME]
+Note:
+1. Per database we can have multiple .NDF and .LDF files
+2. Every database should contain Logical name and as well physical file name with specific
+extension.
+3. Every file should contain one file id to communicate database by using database ID.
+4. MDF and NDF: Data stores permanently
+LDF: Data store for initial transaction processing
+
+5. By default initial size of MDF or NDF: 2 MB and LDF: 1 MB
+6. Auto growth option is always set depending on the file type and gives more value of file
+growth which increases the performance database to faster the transaction.
+Note:
+In SQL Server we can add files [NDF (or) LDF] to the database is online... i.e. without downtime
+can be able to add the files.
+How about System Databases:
+• MASTER: We cannot be able to add any data (.NDF) or log (.LDF) files to master
+database.
+• MODEL: We cannot able to add any data (.NDF) or log (.LDF) files to model database.
+• MSDB: We can able to add files (.NDF or .LDF) to MSDB database.
+• TEMPDB: We can able to add files (.NDF or .LDF) to Tempdb database.
+• RESOURCE DB: We cannot able to add any files due to resource database is read_only
+mode and hidden.
+
+FILE GROUPS
+File Group:
+Set of saved files.
+Collection of files [NDF or MDF]
+Advantages:
+> Ease of Administration
+> Filegroup Backups
+> Performance Benefit
+Note:
+Per instance > 32767 DB
+Per DB> 32767 file groups
+Per File group> 32767 Files.
+Note:
+Tables always create file group level but not specific files. If a file group contains multiple files
+then the table structure creates inside of all files.
+Syntax for file group creation:
+ALTER DATABASE [DBNAME] ADD FILEGROUP [filegroupname]
+
+Pages:
+
+Pages:
+1. The fundamental unit of the data storage is called as page.
+2. Default a page size is 8 KB.
+• Page is the fundamental unit of data storage in SQL Server (data blocks in Oracle).
+• Eight (8) physically contiguous pages => One (1) EXTENT.
+• Disk space allocated to a data file (.mdf or .ndf) in a database is logically divided into
+pages numbered from 0 to n.
+• Disk I/O operations are performed at the page level. (SQL Server
+reads/writes WHOLE pages).
+• Page size: 8kb. ==> 128 pages = 1Mb
+
+Page architecture:
+> Page header: type of the page, page number, object details, how much free space inside the
+page
+Page header size: 96-Bytes
+> Data rows: Where actual data stores inside the page and size is 8060-Bytes
+> Row offset: This is the index of the page when data rows increases the row offset also
+increase. Row offset index of data rows.
+Row offset size: 36-Bytes
+Note: Per MB of space how many pages can allocate?
+128 pages can allocate
+1 GB: 131072 Pages.
+Note: Always pages store inside the extents> in a file.
+Types of pages:
+Total 8 types of pages in SQL server
+> Data: All data type data stores in this page except text, ntext, and image.
+> Index: Only stores index related entries
+> Text\image: text, ntext, image.
+Note: All below 5 types of pages are designed for Sql server engine usage. Called maintaince
+pages.
+> GAM\SGAM: Store information about allocated extents.
+> IAM [Index allocation map]: Stores information about ind
+> PFS [Page free space]: How much free space in a page.
+> BCM [Bulk change mapping]: Store entries about log backup.
+> DCM [Differential change mapping]: Stores information about full database backup.
+
+EXTENTS
+Extents:
+> Minimum unit of data storage called an "extent"
+> Extent is logical storage.
+> 1extent is collection of 8 pages
+> Extent size is: 64 KB [8 * 8 KB]
+> 16 Extents = 1 Mb
+1. Uniform extent: Same type of 8 pages store then call as uniform extent.
+2. Mixed extent: Combination of 8 different types of pages called mixed extent.
+
+1. How to find drive space from SQL Server:
+• XP_fixeddrives
+2. To know compatibility level of all databases
+• Select * from sys.databases [DB ID, collation_name, compitabilitylevel, db created date,
+state]
+3 .To know (dbname, size, owner, date created, status, compitabilitylevel) Particular databases
+• Select * from sys.sysdabases
+4. To know space availability in a log file total and used space...
+• Dbcc sqlperf (logspace)
+5. To know space availability in a data file
+• sp_spaceused ‘database name’
+6. To know the details of a particular database (dbname, filename, filegroup, size)
+• sp_helpfile
+7. To know the details of database (name, filename, path)
+• select * from sys.sysaltfiles
+8. How to take database online and offline?
+• Alter database dbname set offline
+• Alter database dbname set Online
+Note: System databases [master, model, msdb, Tempdb] not possible to take offline
+9. Rename of database:
+• Sp_renamedb ‘olddbname’, ‘newdbname’
+
+
+LOG FILE ARCHITECTURE
+
+> The transaction log is used to generate the data integrity of the database and for data
+recovery.
+> The transaction log file contains a storing of log records. Physically the sequence of log records
+is stored efficiently in the set of physical files that implement the transaction log.
+
+Transaction: Set of statements
+> Transaction is an all/nothing way of execution of set of statements.
+> SQL Server supports two types of transaction.
+Explicit Transaction:
+> A transaction is started with begin Tran and finished with end/commit transaction.
+Syntax: Begin Tran
+Statement1
+Statement2
+Statement3
+Commit/ End Tran
+Implicit Transaction:
+> SQL Server internally adds begin and end transaction for the individual statements.
+Syntax: Statement1
+Statement2
+> MDF Contains pages.
+> Log file Contains Log records.
+> Log file applicable for SQL Server
+Log Record:
+Log Records are entries that are made into the Transaction Log files.
+Log Records contain:
+1) LSN Number
+2) Transaction ID
+3) Timestamp
+4) Transaction statement (insert into student 1 to 10 values)
+5) Statement (Query)
+6) Data page details/Object details
+7) Previous LSN, Log record type, Abort (Transaction committed (or) not redo LSN and Undo
+LSN)
+8) Old image/ new image (Which ever applicable)
+9) Committed/Uncommitted, Completion record
+
+How to find VLF's:
+DBCC LOGINFO
+Status: 0[Inactive] or 2 [Used \active]
+Size of VLF
+File id
+File sequence no
+How many VLF's create on transaction size?
+Virtual Log file creation by default:
+<64 MB::4 VLF's create.
+>=64 MB and <1 GB::: 8 VLF's create
+>1 GB:: 16 VLF's create
+Note:
+For log files always Microsoft recommends to keep FILE GROWTH INTO "Percentage"...
+For Data files always Microsoft recommends to keep FILE GROWTH INTO "MB's"...
+
+How to find whether log file is in use?
+select * from sys.databases :::Verify the column "log_reuse_wait_desc" shows "active" then log
+file is in use ...if not using shows "nothing"
+
+Definitions:
+Committed: Transaction written completely
+Uncommitted: Transaction is in progress
+Dirty Page: Current modifying data inside the pages in buffer pool called "Dirty page"
+
+How to find whether Log file is using or not?
+Select * from sys.databases
+Column: LOG_REUSE_WAIT_DESCRIPTION:
+ACTIVE MEANS: currently ldf file is using
+NOTHING: LDF file is not using or no transactions are running and using WAL concept
+Log file full: 9002 is the error number
+Data file full: 1105 is the error number
+
+> How to find check point information?
+Select * from:: fn_dblog (null, null) WHERE [Operation] like '%CKPT'
+Columns:
+Check point operation [LOP_XACT_CKPT, LOP_BEGIN_CKPT, LOP_END_CKPt]
+Check point start time
+Check point end time
+Dirty page count
+Transaction LSN number
+Transaction id
+
+
+Check Point
+1. A checkpoint writes the current in-memory modified pages (known as dirty pages) and
+transaction log information from memory to disk
+2. Records information about the transaction log.
+
+Check point do:
+Flush dirty to Disk
+Flush only Data pages to disk
+Default, Occurs approximately every 3 seconds
+Does not check the memory pressure
+Occurs for any DDL statement
+Occurs before Backup/Detach command
+Can manually /forcefully run command “Ch
+
+Types of check points:
+1. Direct check point: Which is the default checkpoint triggered by SQL Server engine.
+Default checkpoint time: 3 seconds
+2. Manual check point: Which is always trigger by user
+Syntax:
+Checkpoint [time interval in seconds]
+
+3. Indirect checkpoint: This check point rise when any Sql server technical activities like
+Backup operation
+attach\detach operation
+SQL Server restart
+Cluster failover
+Note: How to capture check point and lazy writer information into Sql server logs?
+Check point:
+DBCC TRACEON (3502,-1)
+3502: TRACE TO CAPTURE CHECKPOINT
+-1: Runs in entire instance level
+How to stop the trace?
+
+
+DBCC TRACEOFF (3502,-1)
+Output store in Sql server logs:
+Checkpoint start time
+Check point end time
+Lazy writer:
+> This is one of the back ground process where works only from BUFFER Cache.
+> Lazy writer works only when system is running with memory pressure or running out of
+memory.
+> User cannot see or create, manual lazy writer operation in Sql server
+> We cannot able to capture lazy writer information into SQL Server logs.
+
+
+Lazy Writer Do:
+Allocating space for new pages in buffer pool
+Checking for memory pressure.
+Only works with buffer pool but not in log file.
+Note: prime job of lazy writer is it flush the pages from buffer to disk.
+Question? How lazy writer knows what pages to flush from buffer to disk?
+Ans: lazy writer check each page header and verify whether all transactions in the pages are
+committed then pages will be flushed to disk... [Page header contains infusion of whether
+committed\uncommitted]
+
+
+Explicit and Implicit commit:
+1. By default system trigger auto commit called “Explicit commit"
+2. If any user started transaction with begin Tran then user should fire manually commit
+otherwise transaction never complete.
+Dirty Page:
+In buffer pool what are the current modifying pages called as "Dirty page"
+SP_WHO:
+
+Spid
+Status
+Login name
+Db name
+Command
+Blocking by
+Host name
+sp_who2 [SQL Server 2005 onwards]
+CPU Time
+Disk I\O
+Spid
+Status
+Login name
+Db name
+Command
+Blocking by
+Host name
