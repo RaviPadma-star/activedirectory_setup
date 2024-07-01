@@ -1,0 +1,41 @@
+Its a database feature
+mirroring does not have any jobs
+mirroring works on end points and port num should be same in mirror server
+
+--> In mirroring we have 2 modes 
+
+1. synch commit and Asyn commit
+
+sync commit means --> what ever transactions are coming frm the principal database it will first go tos the pricinipa db and it will send the transaction trough the private network and deliverd to mirror network
+
+in sync commit the data is coming from the application first it will not commit in the primary data base first it send to the mirror db and the mirror db acknowledge the response and give response to principal db this is called end transaction is confirmed until it will wait the principal log file 
+
+--> data saftery will be ther in sync commit
+
+
+async commit-->  when ever transaction are coming from the app first it will commit to the principal database and later it will send to the mirror server in blw the any network will occurs there might be data lss
+
+principal server cant wailt the aacknowle ment of mirror server
+data loss will be there
+
+in organization we use sync mode for automatic failover we need extra server called witness server, 
+
+witness server--> it will keep monitoring tr principal and mirror server
+
+
+In sync mode we have to 2 types:
+                        -> high safety with data safety with auto matic failover
+			-> sync without auomatic failover (async is a manual failover
+
+demo > we need 2 servers with principal server and mirror server with witness server
+
+
+first create a database --> take full and log backup, copy to secondary servers and restore with no recovery
+intalize he secondary db means take full and log backup of primary db and restore in secondary with no recovery
+--> now need to configure the mirroring
+--> some time it gives error alter the database set partner things remember
+--> sql server and agent mus be in same service account as well with the same login
+--> if data movement is slow restart the endpoints always no downtime activity
+--> if suddenly the primary server is down we need to do failover with cmd only --> alter database databe_name set partner failover
+
+--> we can see by monitoring by the database_mirroring_job in jobs
