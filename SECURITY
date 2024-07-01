@@ -1,0 +1,309 @@
+ROLE OR PERMISSIONS
+
+In SQL Server 3 levels of roles or can restrict users at 3 levels
+Role: A role is nothing but permissions
+How many levels we can secure \restrict users in Sql server?
+> Instance level Role
+> Database level Roles
+> Object level Roles
+
+
+INSTANCE LEVEL:
+B D
+2 P S
+4
+Bulkadmin
+Dbcreator
+Diskadmin
+Processadmin
+Public
+Securityadmin
+Serveradmin
+Setupadmin
+Sysadmin
+How to find Sever Level Roles?
+Exec sp_helpsrvrole
+
+1. Bulk admin:
+User can able to perform bulk insert operation when any data loading activity from application
+side.
+Can load data from any .CSV files
+
+2. DB Creator:
+Login can perform any DDL operations
+Create, alter and drop the database and which is an instance level permission.
+Note: If any login can perform only the specific activities as per role defined to the account.
+3. Disk admin:
+User can able to manage disk level files like MDF, NDF and LDF files.
+Ex: User can able to move the files from one drive to another drive if member of disk admin
+permissions.
+
+4. Process admin:
+1. User can see list of processes which are running in Sql server including system and user
+defined process.
+SPID: 1-50 [System defined process]
+SPID: >51 [User defined process]
+2. User can kill the other user defined spid's.
+Note: User can not kill system defined SPID
+User can not kill his own process id.
+5. Security admin:
+1. New login can create
+2. Password reset can be done
+3. Login removal from SSMS
+4. Login can read SQL Server logs from SSMS
+
+Note: How to read Sql server logs?
+SP_READERRORLOG---------It read from current log
+SP_READERRORLOG 1-----it read from archive log1.
+
+6. Server admin:
+User can be able to change the instance level properties
+Ex: Memory changes to the instance
+Processor changes\allocations
+Authentication mode change
+From windows > Sql and SQL > to windows
+7. Setup admin:
+User can be able to configure linked servers.
+Can be able to configure database email
+8. Sysadmin:
+User can have full control on the SQL Server instance and which is an administrator on SQL
+server.
+Note: Never grant Sysadmin permissions to others\teams until there is requirements.
+Creation of the login by using T-SQL:
+
+Create login [login name] with password='admin123$$'--- SQL authentication
+Create login [hostname\account name] from windows --- Windows authentication
+
+
+DATABASE LEVEL ROLES:
+A B D
+4O S
+DB_Accessadmin
+DB_Backup operator
+DB_Datareader
+DB_Datawriter
+DB_Ddladmin
+DB_Denydatareader
+DB_Denydatawriter
+DB_Owner
+DB_Securityadmin
+User can get specific permissions at database level.
+User creation:
+CREATE USER [username] FOR LOGIN [loginname]
+Note: Without login we cannot be able create user.
+Note: When we map any login with database by default that login name create as user in
+specific database.
+1. DB_Access admin:
+1. can able to create users in the database
+2. can able to drop the users from the database
+
+2. DB_Backup operator:
+1. User can able to perform backup operations in Sql server
+Syntax: Backup database dbname to disk='path'
+2. Can be able to trigger manual check point in the database.
+Checkpoint [time interval]
+3. DB_Data Reader:
+User can only able to perform data reading from all tables with in the specific database.
+Query Type: Select
+4. DB_Data writer:
+User can only able to perform data write into all tables with in the specific database.
+Query Type: Insert
+5. DB_DDL admin:
+User can able to perform
+Create
+Alter
+Drop
+Ex: Create table\Alter table\ Drop table
+6. DB_Deny Data reader:
+User cannot be able to read the data
+7. DB_Deny data writer:
+User cannot be able to write the data
+Note:
+1. If we have db_owner & DB_Deny data reader or writer permission then we can be able to
+perform all operations on database except reading\writing...Preference goes to DENY
+2. If we have sys admin & DB_Deny data reader\write permission then we can be able to
+perform all operations on database...Preference goes to SYSADMIN.
+3. Provide reader and deny data reader permission to same account then user cannot be able to
+read the data.
+8. DB_OWNER:
+Users have full permissions at database level.
+9. DB_Security admin:
+User can get permissions of giving roles to other users at specific table\store
+procedure\views\functions...etc
+Note:
+Grant: Can grant permissions to the user account.
+With grant: User gets permissions and at the same time user can pass the permissions to other
+users.
+Deny: Deny the permissions...
+10. Public:
+Basic connectivity to the instance and visibility to the databases.
+Limitations:
+> Public roles cannot deleted
+> Public roles cannot be altered
+> Public roles cannot be uncheck
+> Public role is by default common for every databases
+Note:
+1. Always keep database owner as SA account which is inbuilt SQL Server account and we never
+delete that account.
+2. Any account is using as owner for specific database you cannot be able to delete until you
+change the owner of the database.
+3. You cannot able to delete the login if any active sessions are running.
+4. Unlimited logins and users possible in SQL Server
+Schema:
+> It is a collection of objects under a database principal (user)
+> It is always present in database
+> If we not mentioned any schema for user, he occupies the default schema-(db)
+> Every principal has schema
+Create schema <schema name>
+
+Enable & Disable App role:
+Sp_setapprole ‘approlename’,’password’
+Unset_setapprole ‘approlename’,’password’
+
+OBJECT LEVEL ROLES
+> Insert
+> Alter
+> Control
+> Delete
+> Select
+> References
+> Take ownership
+> Update
+> View definition
+Note:
+> If I grant any database level role then can get permissions on all tables inside the database
+> If I grant any table level role then can get only on specific table set permissions and cannot
+access other tables due to object level restriction.
+PRINCIPALS:
+> Principals are entities that can request SQL Server resources like other components of the SQL
+Server authorization model, principals can be arranged in a hierarchy.
+> Every principal has a security identifier (SID) which is presents in hexadecimal part.
+
+Windows- level principals:
+> Windows Domain Login/Group
+> Windows Local Login/Group
+SQL Server-level principals:
+> SQL Server Login
+> Server roles
+Database- level principals:
+> Database user
+> Database role
+> Application role
+> If we want to give permissions to 100 users, we need not give manually 100 times to users,
+simply we can put them as a group, with that group we can give permissions at one time.
+> If we want to see the principals in our server through below quires.
+Select * from sys.server-principals
+Select * from sys.database-principals
+Principal types in SQL Server:
+U—Windows user
+G—Windows Group
+S—SQL User
+A—Application role
+R—Database role
+C—User mapped to a certificate
+K—User mapped to an asymmetric key
+Ex: Logins and users
+
+SECURABLES:
+> Securables are the resources to which the SQL Server Database Engine authorization system
+regulates access.
+> The Securables scopes are server database and schema
+
+What you are going to secure
+Ex: Instance, databases, tables, sp, functions, triggers. etc
+
+SECURITY HARDENING RULES:
+Hardening is nothing but protecting the Sql server from the threats or end users
+> Keep always SA password as strong. [Default pwd: SA]
+> Remove unnecessary logins from SQL Server.
+> Remove unnecessary users from SQL Server
+> Remove built-in\administrator from SQL Server
+> Always try to create windows authentication instead of SQL Server authentication
+> Remove unnecessary roles
+> Always create a group instead of individual logins.
+
+> Never share SA password to other teams
+> Never give Sysadmin permissions to any other teams except DBA team until strong reason.
+How to enable or disable logins:
+ALTER LOGIN [LOGIN NAME] ENABLE\DISABLE
+Login Failure Error number and states:
+User name wrong: 18456 state 5
+Password wrong: 18456 state 8
+Password expired: 18456 state 18
+Account locked out: 18456 state 1
+
+How to create a service account in real time?
+Real time process:
+> Windows team create always service accounts in domain servers
+> Server account "passwords never expire” option should enable and "USER must change the
+password" option should be disable or uncheck.
+> Short cut to open user management “DSA.MSC"
+How to change any service account from local to domain?
+Go to service> properties> Logon >Set domain account.
+Note: changing account for the service required restart of SQL Server only specific service.
+New feature in SQL Server 2000\2005 \8\8r2:
+Database level roles can be added which is not fixed.
+Note: From SQL Server 2012 onwards user defined servers can be created
+Syntax:
+Role Creation:
+USE [dbname]
+GO
+CREATE ROLE [RSExecRole] AUTHORIZATION [dbo]
+GO
+Drop Role:
+USE [dbname]
+DROP ROLE [RSExecRole2]
+GO
+Note: In real time apps team define this roles and request DBA team to execute the script.
+How to create a group and provide the permissions to group?
+Steps:
+1. Create users at o\s level
+2. Create a group at o\s level
+
+3. Add users into the group
+Above 3 steps performed by windows team
+4. Add the same group as a login into Sql server
+5. Provide permissions to group.
+Note: when any requirement to provide highest level of permissions and member in a group,
+then add that particular account as a login and provide permissions only.
+
+How to provide sp level permission?
+GRANT EXECUTE ON [store procedure name] TO [user name]
+
+
+SQL Server security queries:
+1. How to get Login information in Sql?
+Select * from sys.syslogins
+> Login name
+> Login authentication type
+> Password
+> Server level roles
+> Login created date
+> Login modified date
+
+2. How to get user information in Sql?
+Select * from sys.sysusers
+> User name
+> User created date and time
+> User modified date and time.
+
+Default Users:
+SQL Server ships with ten pre-defined schemas that have the same names as the built-in
+database users and roles. These exist mainly for backward compatibility
+Every database has 4 default users:
+1. SYS
+2. INFORMATION_SCHEMA
+3. GUEST
+4. DBO
+SYS & INFORMATION_SCHEMA:
+
+DBO:
+The dbo schema is the default schema for a newly created database. The dbo schema is owned
+by the dbo user account. By default, users created with the CREATE USER Transact-SQL
+command have dbo as their default schema.
+If any member provided as Sysadmin role then can able to access all the database by using
+DB_owner role.
+
+SQL Server certificates:
+Server principals with names enclosed by double hash marks (##) are for internal system use
+only
