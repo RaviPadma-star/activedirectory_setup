@@ -145,3 +145,138 @@ in case memory is 90% we see a quick troubleshooting you know instance-> propert
 
 --> once the issue resolved then set the default values as same
 
+--> if the cpu is more utilization go to instance --> properties-> advanced 
+--> max degree of parallelism
+--> cost threshold for parallesim
+--for every query it execute the plans behind
+--> each plans have some cost 
+
+plan 1 ->1min 50% resources
+plan2- 2mins
+plan3 - 30 sec 100% resources
+
+this plan can select for execution of query
+
+this will stored in plan cache
+
+--> LRU -- least reacently used plans
+MRU--> most recently used plans
+
+--> next you run same query, don't prepare any plans for seperatly it will stored in plan cache
+--> if you are not running the query, it will dropeed from lru
+
+--> if you want to execution plan there are 2 types of execution plan
+1. estimated execution plam
+2.actual execution plan
+
+where to check:
+sp_whoisactive
+
+there is button called ctrl+m --> actual execution plan, crtl + l --> estimated execution plan
+
+
+let come back to cpu configuration, parallelism
+--cost thershld for paralleslim
+max degree of parillesim
+means cot means query cost--> threshold means--> means maximum value parallism means--> simentonusly
+
+in case query cost is more than 5 percent
+then go to parallelisum --> one is serialism, 2 is parellesium
+if query cost is less than 5 percentage it goes to serialisim
+
+
+if more than 5 percent it goes to parrallesim the idle valu is 5 only
+
+serialism is best for some secenerios and parrelism is best for some secenerios
+
+this  values will tell you if go for serialism or parrelism''now max degree of parrallism
+
+
+maxdop 1
+
+what is ctp and max dop
+cost threshold parallism -ctp
+what it means --> for example --> if I want to do parallel thing
+
+if parallelism is needed, now how many cpu cores has to be utilized will decide by maxdop if parallesim is need how many cores we needed --> depends on machine core cpu only
+
+--> if you have 4 cores means, the max dop is used 4 cores for parallelism
+
+--ctp -- will decided weather it goes to serialism on parallism
+-- maxdop will decide how many cores should use of parallism, it purely depends on machine cores
+
+
+Dirty Pages: Dirty pages is nothing but modifying the pages in memory is called dirty pages
+
+ex: when you read or write something un-commited transaction when you write in the log file it will write a page which ever modified page is called dirtypages
+
+when you fire a sql query, first it will check any semantic error are there it will parse it-- if table will be existing means what collection of pages imagine if customer table sitting on 100 pages and keep into the memory and from there we gone read it correct in case you doing any insert statement, the page that you modified the page will be loaded into memeroy, now you modify the recors, now the page is changed right, previous that modified page is called dirty page
+
+
+--> lazt writer --> wont manage automatically, when there is more huge memory, pressure will it manage
+
+--> maxdop means what how cpu cores must be utilized that will decide maxdop
+the idle value is the recommande value is 8
+
+--> if you server as more cores, where to check go to performance task manager or simply cmd--> systeminfo or system information--will see a option as processor tab
+
+
+
+so now lets discuss about the indexes:
+
+what is indexes, how to see the indexes how may types of indexes are there, where we can see the indexes, how to create indexes, what is the imp of indexes
+
+--> INDEXES
+	--> indexes index will be help you for selelcted query only, only for select query whre condition where clause
+
+
+--> index also an object, index will helps in searching data fast, indes improve the performance of slect query, index also some storage, index has its own page, do not create indexes on tables having min. 1000rows, no need to create any index on the table having minimum 1000 rows, it will give give you negative performance. on a table we can create maximum 999 indexes, for sql server 2005 the value is 249
+
+2 types of indexes
+1. clustered indexes
+2. non-clustered indexes
+
+when you create a clustered indexed based on ley, on any column so the the records are orgainsed based on clustered ky values
+
+-->when you created cluster index, it re-organized the records, it will drop the table, re-create the table based on the clustered index column
+--> creating clustering indexing are downtime activity or no down time activity
+
+it has to re-arrange the table it will go to tempdb from there sql server the whole operation take place in tempdb, when you trying to create a tabke or cluster index, the whole table move into tempdb from there it will re-arrange the records cluster index are mainly generate on ids
+
+--> to crate the clustered indexes pre-req
+
+you should have primary key, based on the key value. it is going to re-arrange all the record
+-> if you have primary key on the table clustered index will be created automatically
+
+-- where can we see the indexes, go the database--> go to tables--> expand index double click--> pk_department(clusterd indexes)
+
+Non -clustered index--> it does not re-arrange the record. the records will be same as it is but there is sperate column called intermediate key it will store the addres of each record in case while searching the data it will simply refers the address guys it will manage the non clustered index
+
+--> Generally sometimes while running the query, we may face missing indexes cause the performance issue
+
+--> how to check missing indexes
+--> select * from sys.dm_db_missing_index_details and also we can use execution plan
+
+--> in case usr is complaing hey ravi this query running very solw what we have to do 
+
+-> take that query from user, we will do all health check from our side ntg found
+--> so will take the wuery from customer, we will use what and tables including in the where condition, weather the column are part of indexes are not will check it
+
+--> search for images in goggle
+
+terminology--> in interwiew sometimes they will ask you --> what is heap--> a table which has no clustered indexes created, on it is called heap
+when search is performed on a heap, it always going to ba full table scan, this scan are very dangerous for sql sever performance (large tables)
+--> selct * from sys.indexes where index_id = 0
+
+--> index seek--> seek will not do full table scan, it will touch the exact colums will search the data based on index keys index scan is equal to table scan
+
+index scan is equal to the table scan
+
+covering index: interview --> in the non-clusterd index if we cover all the columns then it is called covering index..
+--> if the book size is increasing defently the index pages will increase right on the same way --> index page is also one kind of page this page how much index page must have be fulled, is called index fullfactor --> if index page is completely full it will create excessive page splits -> if its create execessive splits then performance will be de-graded
+--> so best practice is keep 20% free space in each page that is called index fill factor
+--> how to do that, go to instance properties, go to database setting-> default index fill factor -> zero
+that means what will will define the freee space in zero means its disabled
+--> we will use 100% percentage-> ok if index page 100% full it will create execussive split, if excessive splits are there, they are going to degrade the performance issue, the idle values I 80%--> it will occupy 800% remaining 20% will be free only on index page not data pages --> this is the post installation steps
+
+
