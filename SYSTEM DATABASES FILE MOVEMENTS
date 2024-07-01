@@ -1,0 +1,58 @@
+System Database File Movements:
+Note: for system database you have to take complete Sql server instance restart [instance level
+downtime is required]
+
+TEMPDB FILE MOVEMENTS:
+1. Collect logical file names for Tempdb
+2. Update logical name for Tempdb database by using alter command with new path
+ALTER DATABASE Tempdb modify file (name='tempdev', filename='new physical
+path\tempdb.mdf')
+ALTER DATABASE Tempdb modify file (name='templog', filename='new physical
+path\templog.ldf')
+3. Take your SQL Server instance offline.
+4. Start your SQL server instance.\restart Sql instance...
+Stop\Start instance from CMD:
+
+
+Default Instance:
+Net stop "SQL Server (mssqlserver)"
+Net Start "SQL Server (mssqlserver)"
+Named Instance:
+Net stop "SQL Server (Named instance Name)"
+Net Start "SQL Server (Named instance name)"
+
+5. Tempdb new files [.mdf, .ldf] will automatically create in new path.
+6. NOTE: After verification if your instance ok then remove your old Tempdb files.
+Note: For system databases you cannot perform offline, attach, detach, drop, delete
+
+
+
+MASTER DATABASE FILE MOVEMENTS:
+Steps:
+2. Go to configuration manager-->advanced tab-->startup parameters--> specify new path for
+your .mdf and .ldf files
+3. Take SQL Server instance stop state.
+4. Copy physical .mdf and .ldf files to new location or new path.
+5. Start your SQL Services.
+Note: Instance level down time is required.
+
+
+MODEL DATABASE FILE MOVEMENTS:
+1. Collect logical files name for your MODEL database.
+2. Change logical name for Model database by using alter command.
+Alter database model modify file (name='modeldev', filename='D:\DATA\model.mdf')
+Alter database model modify file (name='modellog', filename='D:\DATA\modellog.ldf')
+3. Stop Sql server instance services
+4. Move physical mdf and ldf files for model database.
+5. Execute sp_helpfile for verification.
+
+
+MSDB DATABASE FILE MOVEMENTS:
+1. Collect logical files name for your MODEL database.
+2. Change logical name for Model database by using alter command.
+Alter database msdb modify file (name='MSDBData', filename='D:\DATA\MSDBData.mdf')
+Alter database msdb modify file (name='MSDBLog', filename='D:\DATA\MSDBLog.ldf')
+3. Stop Sql server instance services
+4. Move physical mdf and ldf files for model database.
+5. Execute sp_helpfile for verification..
+
