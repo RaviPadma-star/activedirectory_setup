@@ -1,0 +1,115 @@
+ SQL Server architecture is mainly divided into different components i.e. SNI Protocol Layer,
+Relational Engine, Storage Engine, Buffer Pool. Majorly classified as two main engines:
+Relational Engine and the Storage engine.
+
+SNI (SQL Server Network Interface)
+> The SQL Server Network Interface (SNI) is a protocol layer that establishes the network
+connection between the client and the server. It consists of a set of APIs that are used by both
+the database engine and the SQL Server Native Client (SNAC)
+
+
+➤Shared memory: Simple and fast, shared memory is the default protocol used to connect
+from a client running on the same computer as SQL Server. It can only be used locally, has no
+configurable properties, and is always tried first when connecting from the local machine.
+➤TCP/IP: TCP/IP is the most commonly used access protocol for SQL Server. It enables you to
+connect to SQL Server by specifying an IP address and a port number. Typically, this happens
+automatically when you specify an instance to connect to. Your internal name resolution system
+resolves the hostname part of the instance name to an IP address, and either you connect to
+the default TCP port number 1433 for default instances or the SQL Browser service will find the
+right port for a named instance using UDP port 1434.
+➤Named Pipes: TCP/IP and Named Pipes are comparable protocols in the architectures in
+which they can be used. Named Pipes was developed for local area networks (LANs).
+
+
+The Relational Engine:
+The Relational Engine is also sometimes called the query processor because its primary function
+is query optimization and execution
+
+1. Command Parser:
+The Command Parser’s role is to handle T-SQL language events. It first checks the syntax and
+returns any errors back to the protocol layer to send to the client. If the syntax is valid, then the
+next step is to generate a query plan or find an existing plan. A Query plan contains the details
+about how SQL Server is going to execute a piece of code. It is commonly referred to as an
+execution plan.
+Plan Cache: Creating execution plans can be time consuming and resource intensive, so The Plan
+Cache, part of SQL Server’s buffer pool, is used to store execution plans in case they are needed
+later.
+
+
+2. Query Optimizer:
+
+
+The Query Optimizer is one of the most complex and secretive parts of the product. It is
+what’s known as a “cost-based” optimizer, which means that it evaluates multiple ways to
+execute a query and then picks the method that it deems will have the lowest cost to execute.
+This “method” of executing is implemented as a query plan and is the output from the
+optimizer.
+
+3. Query Executor:
+The Query Executor’s job is self-explanatory; it executes the query. To be more specific, it
+executes the query plan by working through each step it contains and interacting with the
+Storage Engine to retrieve or modify data.
+
+
+The Storage Engine:
+
+> The Storage engine is responsible for managing all I/O to the data, and contains the Access
+Methods code, which handles I/O requests for rows, indexes, pages, allocations and a Buffer
+Manager, which deals with SQL Server’s main memory consumer, the buffer pool. It also
+contains a Transaction Manager, which handles the locking of data to maintain Isolation (ACID
+properties) and manages the transaction log.
+
+
+1. Access Methods:
+
+> Access Methods is a collection of code that provides the storage structures for data and
+indexes as well as the interface through which data is retrieved and modified. It contains all the
+code to retrieve data but it doesn’t actually perform the operation itself; it passes the request
+to the Buffer Manager.
+
+2. Buffer Manager:
+
+
+> The Buffer Manager manages the buffer pool, which represents the majority of SQL
+Server’s memory usage. If you need to read some rows from a page the Buffer Manager will
+check the data cache in the buffer pool to see if it already has the page cached in memory. If the
+page is already cached, then the results are passed back to the Access Methods. If the page isn’t
+already in cache, then the Buffer Manager will get the page from the database on disk, put it in
+the data cache, and pass the results to the Access Methods.
+
+3. Transaction Manager:
+> The Transaction Manager has two components that are of interest here: a Lock Manager
+and a Log Manager.
+> The Lock Manager is responsible for providing concurrency to the data. The Access Methods
+code requests that the changes it wants to make are logged, and the Log Manager writes the
+changes to the transaction log. This is called Write-Ahead Logging.
+
+Checkpoint Process:
+> A checkpoint is a point in time created by the checkpoint process at which SQL Server can
+be sure that any committed transactions have had all their changes written to disk. This
+checkpoint then becomes the marker from which database recovery can start.
+
+
+Lazy writer:
+> The lazy writer is a thread that periodically checks the size of the free buffer list. When it’s low,
+it scans the whole data cache to age-out any pages that haven’t been used for a while. If it finds
+any Dirty pages that haven’t been used for a while, they are flushed to disk before being marked
+as free in memory.
+
+Checkpoint occurs:
+Manual checkpoint command fires
+Auto check point
+Backup command fired
+Alter database command
+SQL Server shutdown
+Cluster failover
+Snapshot is created
+Commit is issues.
+Add file and file group arch
+Pages and extents
+NDF, MDF and LDF arch
+Lazy writer
+Check point.
+Dirty pages
+Dirty data.
+
