@@ -1,0 +1,23 @@
+Log file full:
+Error: 9002
+Steps:
+1. By using select * from sys.databases and verify the column "log_reuse_wait_desc" to find any
+active transactions are there?
+DBCC SQLPERF (Logspace)
+2. Check whether log file growth is set to restricted or unrestricted?
+If set restricted then increase the size for log file growth.
+3. Verify whether log backups are running or not if not manually run one T-log backup.
+4. Try to perform SHRINK operation which can release the space.
+5. Check the disk space availability where you kept log file
+6. If disk space is not available then add the over_flow file into the disk where space is available.
+
+7. Perform file movement after approval to the disk where it have enough free space.
+8. Verify whether log backups are running or not if not manually run one T-log backup.
+
+
+Last option:
+TRUNCATE ONLY ;;;( Not recommended in production server)
+Backup log dbname with truncate_only
+Note: VLF'S deleted from log file and due to truncate operation. You may get the free space in
+log file but chances of data loss.
+
