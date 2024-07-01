@@ -1,0 +1,90 @@
+Reasons: Below 3 areas will impact your performance.
+• Disk Issues
+• DB Design
+• Bad written Queries
+
+
+What is the purpose of SQL Profiler in SQL server?
+
+• SQL profiler is a tool to monitor performance of various stored procedures. It is used to
+debug the queries and procedures. Based on performance, it identifies the slow
+executing queries. Capture any problems by capturing the events on production
+environment so that they can be solved.
+SQL Profiler captures SQL Server events from a server. The events are saved in a trace file that
+can be used to analyse and diagnose problem.
+The different purposes of using SQL Profiler are:
+• It is used to find the cause of the problem by stepping through problem queries.
+• It is very useful to analyse the cause of slow running queries.
+• It can be used to tune workload of the SQL server.
+
+Use SQL Server Profiler:
+• Monitor the performance of an instance of the SQL Server Database Engine, Analysis
+Server, or Integration Services (after they have occurred).
+• Identify the cause of a deadlock
+• Debug Transact-SQL statements and stored procedures.
+• Audit SQL Server activity
+• Monitoring T-SQL activity per user
+• Analyze performance by identifying slowly executing queries.
+• Perform stress testing and quality assurance by replaying traces.
+• Collect a sample of events for tuning the physical database design by using database
+engine tuning advisor
+• Replay traces of one or more users.
+• Perform query analysis by saving Show plan results
+
+Aggregate trace results to allow similar event classes to be grouped and analyzed. These
+results provide counts based on a single column grouping.
+• Correlate performance counters with a trace to diagnose performance problems.
+• Configure trace templates that can be used for tracing later
+
+
+To start, stop and delete a trace you use the following commands.
+To find traceid
+SELECT * FROM:: fn_trace_getinfo (default)
+This will give you a list of all of the traces that are running on the server.
+To start a trace
+Sp_trace_setstatus traceid, 1
+
+
+Traceid would be the value of the trace
+To stop a trace
+Sp_trace_setstatus traceid, 0
+Traceid would be the value of the trace
+To close and delete a trace
+Sp_trace_setstatus traceid, 2
+To delete you need to stop the trace first and then you can delete the trace. This will close out
+the trace file that is written.
+
+
+DBA Database Check list:
+1. DBCC opentran--To check what the current open transactions are running
+2. Check blockings
+3. Check deadlocks
+4. Check indexes
+5. Check fragmentation: Accordingly perform reorganize or rebuild
+6. Check file growth settings
+7. Check isolation levels
+8. Check I\o operations.
+
+
+Development query tuning\checklist:
+Joins
+Number of columns (eg:: 6 columns to get data but used select * from option then it will use all
+the columns)
+Grouping functions (sum, avg, max, min, aggregate)
+Choosing the better index
+
+
+Perform implicit and explicit operations
+Check no_lock functionality is enabled...
+
+
+What are the events is captured SQL Profiler?
+• T-SQL statements, stored procedures
+• Cursors, locks( deadlock)
+• Database objects and auto growth of size of data & log files
+• Error & Warnings( syntax errors)
+• Performance( show plan)
+• Table scans
+• Security audits(failed logins, password changes)
+• Monitor server control, memory changes(cpu, reads, writes)
+• Sessions, transactions, tuning
