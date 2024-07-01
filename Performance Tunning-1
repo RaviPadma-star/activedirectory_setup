@@ -1,0 +1,147 @@
+1. In case your quires are running slow, if the application running slow, if your cpu utilization more than 90%, if your memoery is more than 90% utilization, all these features of impacting the sql server, the configuration of tempdb issues, server configuration, normal road bloacks. impact the performance of application
+
+
+tell me one thing--> now one query is running since 5 hours--> now tell me do we have performance issue here or we don't have performance issue here:-> 
+
+--> now basically it depends --> you are running a backup query of 5tb, do you think it will completed in 2 seconds -> no its depends on data
+--> long running session are comman in sql server
+--> if query is running slow you have to compare previous time, or earlier it run for less time now its running more time then there is performance issue
+
+--> so what and all issues will see on performance issues on regular basis-->
+1. cpu more than 90%
+2. memory more than 90%
+3. blockings
+4. some time temp full issues, tempdb contentions, blockings, deadlock and incase user will complaint hey, query is running slow, app is running slow, when ever they click the tab it running slow.
+
+so generally we do healt check, sql server eb=ven if we tool care of all sql servers at our end, configuration best possible setting even though we did it- but still the query is running slow means what might be the reason -> in case network is slow in case os drives, storage the read and write operation are slow then also will get performance issues, these thing are not control by purselves
+
+--> generally performce issues, what kind of health check we do
+   --> health checks means -> cpu utilization, memory utilization, blocking drives spaces including,, cdrive, data drive, log drive, backup drives, event viewer,  you have to check all db status, weather db are up and running or not, sql services are running or not
+
+
+--> lets go to the cpu utilization
+	-> task manager --> ill keep monitoring
+	-> imagine, you running a backup query, you know that backup query are performance killers- so if the sql server is busy with some other tranactions, at the same time you took the backup, suddenly there will be a spike in the resources, your cpu, memory, disk I/o
+
+	--> in the organization, generally we get cpu utilization, memory utilization, disk utilization
+	--> once 90% usage is hit will get alert, so on server, now you login into yhe server, yoy get a mail stating that so on server cpu utilization is 95%, now you login automatically go up and down if you getting lot of performcae issue, there are 2 factors one is didn't setup the system properly, means you are following but recommended practices setting.
+2--> the development team is very poor
+
+-> if cpu 90% utilization, once login to yhe server, just wait for 15 to 20 mins, automatic solution, will be there, it will come down, if not we have to trouble shoot the thingd
+	--> cpu, memory , blockings are common
+	--> troubleshooting-->  login to the server open task manager, so now what have to do --> after watching 15 to 20 min the issues is not fixes--> imagine its cpu issue now click on cpu tab once, you can see ascending and decending order, on the top we can see which process like window and other releated taking more cpu memeroy disks, means we don't do anything its not in our hand, simply inform to windows tems, windows team will take care of it
+
+--> if the top sql server is there then we have to takecare of it
+	--> if sql server is taking more process means we have to check -> which sql server is more consuming the process. which instance is taking--> so once you get the instance name then we will connect to the sql server instance
+--> in case if we have blocking, it will effect the performance issue, Blocking are very common in sql, because lot of users access, the resources at a time, which create a logs on resources, until the transaction is going to completed, the logs wont be released, so the other person have to wait very comman, on busy system, we can see many blockings-> blocking are come and go automatically.
+
+
+how to check blocking:-->
+cmd--> sp_who2 --> we can see blk by 
+ex: 45 - is blk by session id is called lead blocker or head blocker
+
+--> how to find lead blocker
+   --> google -> sql script to find the lead blocker -> pinal dave--> open brent ozcr
+
+--> diff state of transaction means status, suspended, sleeping, backgroung, runnable
+
+--> I want to see exclusive, blocking
+	--> select * from sys.sysprocesses where blocked <>0
+
+--> sp_who2 is active
+it will give error, because its custom script, we have to deploye in stored procudre, in case blocking are there, what is the solution, you can see login, Anusha session is blocking go to the teams Anusha or send email, your session is blocking other session, is that ok kill your sessions or you going to cancel your session, if she say yes you can go head and kill it. otherwise Anusha with cancel the window and blocking will be completed. once lead blocker is killed.
+-> in some secenrio, Anusha is not responding after taking the approval of Anusha manager, then you can kill the sessiom, without approval, don't kill the sessions
+
+
+Deadlock--> is a one type of blocking, so imagine if Anusha is there and Lalitha they both are running same query on the same object, at the same time they running so one session, if 2 session are blocked by each other is called deadlock  -->
+
+--> the impact of dead lock is its create the dead lock dump
+--> how to find deadlocks
+--> for this we enable trace flags
+--> how to enable trace flags--> using query called 
+	-->DBCC trancon
+--> we havve to 2 trace flags
+	-->dbcc trancestatus
+
+--> how can we congifure dbcc, ebale for globally--> sql server config manager
+	--> dbcc traceon (1222) --> to track dead lock
+	--> dbcc traceoff(1222)  -> 1204 -to trace flag help to find or track the dead locks
+
+--> to see dead locks -> first we need to enable the transon(1222),
+				--> dbcc traceon(1222)
+				--> dbcc traceon(1204)
+
+then
+
+--> dead lock auto resolved, out of 2 transaction the highest priority will run and least priority transaction killed automatically
+
+--> if you keep getting dead locks, might generate, deadlock dump, deadlock dumo can generate, dead lock schedular, it might be restart the sql server, this secenerion, if want to fix the issue, you have to check the session running by Lalitha and Anusha check both session
+
+--> if the continuously getting the dead locks before the it generates, login the server using sql profiler -> tols-> sql server profiler--> if you enables the profiler, it keeping profiler enabled for longtime, it will get performance issue
+
+--> if you are team lead ask you to check dead lock, you know the by every week the dead lock generating by 3 pm, you login to the server by 2:55--> tools-> sql-profiler-> create a trace on
+
+--> sql profiler is a mandotaory tool you can monitor, the things are running using sql-profiler, profiler is a performace killer you cant enable for long time-> only during some secenrios like dead lock, to track it --> select the event selection tab -> right side Check mark show all events--> epands locks--> run it running -> now I can generate the graph --> google script to generate dead locks in sql server--> brentozar.om
+
+--> select * from sys.dm_exec_requests
+
+and also go to sql server error log
+--> management-> expand-> sql serverlogs
+--> for global adding trace flags sessions for trace on --> go sql --> configuration manager--> select insance, right click-> properties--> startup-paramater--> -T1222 --> click add
+					-T1204 --> click add
+
+but adding the trace log from the configuration manager-required restart of the sql server
+
+--> if enable trace flag from locally no need of restart the sql server
+
+--> it continuously dead locks are coming we can connect to the customer or developers to re-writhe logics, solutions
+
+-> if our session is killed, using dead lock immediately, will get update the seesion will klled the victim
+
+
+
+--> how to deploy sp_whoisactive
+	--> gogle -> sp_whoisactive doqnload
+copy and paste on desktop server double click open with ssms -k execute
+
+
+--> if you kill any section, it goes to roll back state
+--> lets discuss other reasons cause the performance issue
+
+--> if any job are running since hours, because of performance issue, it crossing the business hours
+--> go to sql server agent --> job activity monitor
+
+--> if you executing the status, in activity monitor check which jobs are running, application related jobs, are ok,  if this running in business hours--> but any maintance related jobs are backup, jobs restore jobcheck db jobs--> index rebuiliding jobs, index re-organizing jobs, update statices jobs there are all maintance jobs, these jobs are running in business hours, will ger performance issue, kill the job if necessary
+
+--> check -> job--properties -> viewhistory--> duration--> then decide--> compare the timings
+
+--> backup jobs
+--> check db jobs
+--> dbcc update statistics
+--> indexing job              -> non-business hours if theres are running in business hours means its a performce issue
+
+
+next is configuration--> while installing sql server, people may forget enable the configuration setting so if you don't eb=nable the config setting, generally the query will run sloqly
+
+--> what kind of config setting is enabled
+
+-> the config setting are diff for cpu, and memory so it is cpu issue you have see config setting
+
+-> lets discuss memory in 95% you have to check configuration setting
+
+--> for memory there is configuration setting, max server memory
+--> go to instance properties--> memory
+   ex 2147483647 2 peta byts
+
+--> 80% of machine wil allocate sql server
+this is post installation setting
+
+--> if you are machine having 32 gb of memory maximum memory I can allocate to the sql server ->32gb of 80%
+--> incase other external services are there like ssis, ssrs -- in this case 60% of max memory can allocate to the sql server
+
+--> 40% bids will use this allocation
+--> this is on the fly setting -means immediately it will effect means no -need to restart
+in case memory is 90% we see a quick troubleshooting you know instance-> propertirs-memory->26000 to 24000 immedietly solution--> but it temp it will save us
+
+--> once the issue resolved then set the default values as same
+
