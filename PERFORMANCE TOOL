@@ -1,0 +1,46 @@
+Performance monitor:
+This is one of tool in built in SQL Server and the main purpose is to capture resource utilization
+in SQL Server in terms of CPU,
+
+MEMORY, DISK I\O and network
+
+1. MEMORY COUNTERS:
+1. Page life Expectancy:
+This counter tells how much time page residing in the buffer pool is nothing but Page life
+Expectancy.
+The standard value should be greater than 300.
+
+
+2. Lazy Writes/Sec:
+This counter tracks how many times a second that the Lazy Writer process is moving dirty pages
+from the buffer to disk in order to free up buffer space.
+Note: Generally speaking, this should not be a high value, say more than 20 per second or so
+
+
+3. Checkpoint Pages/Sec: When a checkpoint occurs, all dirty pages are written to disk. This is a
+normal procedure and will cause this counter to rise during the checkpoint process.
+Note: Default automatic check point value is 3 sec
+
+4. Page reads/sec: Number of physical database page reads issued. 80 – 90 per second is
+normal. Anything value more then leads to memory pressure.
+
+5. Page writes/sec: Number of physical database page writes issued. 80 – 90 per second is
+normal. Anything value more than leads to memory pressure.
+
+
+8. Buffer Cache hit ratio: Percentage of pages that were found in the buffer pool without
+having to incur a read from disk.
+Standard value is always >90%
+
+9. Target Server Memory (KB): Total amount of dynamic memory the server can consume.
+10. Total Server Memory (KB): Total amount of dynamic memory (in kilobytes) that the server is
+using currently
+
+2. DISK COUNTERS:
+1. Avg. Disk Sec/Read: Measure of disk latency. Avg. Disk sec/Read is the average time to read
+data from disk
+Excellent < 08 Msec (.008 seconds)
+Good < 12 Msec (.012 seconds)
+Fair < 20 Msec (.020 seconds)
+Poor > 20 Msec (.020 seconds)
+
