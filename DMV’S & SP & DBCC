@@ -1,0 +1,97 @@
+DMV’S [DYNAMIC MANAGEMENT VIEWS]
+
+Locks:
+Select * from Sys.dm_tran_locks:
+Returns information about locks
+
+
+Blockings:
+Select * from sys.dm_os_waiting_tasks:
+
+Sys.dm_os_wait_stats:
+> Returns information about all the waits encountered by threads that executed. You can use
+this aggregated view to diagnose performance issues with SQL Server and also with specific
+queries and batches.
+
+
+2. Database Related DMV’S:
+Mirroring:
+1. Sys.dm_db_mirroring_auto_page_repair:
+1. Returns a row for every automatic page-repair attempt on any mirrored database on the
+server instance.
+2. This view contains rows for the latest automatic page-repair attempts on a given mirrored
+database, with a maximum of 100 rows per database.
+2. Sys.dm_db_mirroring_connections:
+Returns a row for each connection established for database mirroring.
+
+
+3. INDEX related DMV’S
+Fragmentation: DMV's to find 2005 onwards
+1. Select * from sys.dm_db_index_physical_stats:
+To find Column to verify the fragmentation value:
+Avg_fragementaion_in_pernt:
+
+Missing Index:
+Select * from sys.dm_db_missing_index_details:
+
+
+sys.dm_db_index_usage_stats:
+Returns counts of different types of index operations and the time each type of operation was
+last performed in SQL Server.
+
+
+5. Replication related DMV’S:
+
+Sys.dm_repl_articles:
+> Returns information about database objects published as articles in a replication topology.
+Sys.dm_repl_tranhash:
+> Returns information about transactions being replicated in a transactional publication.
+Sys.dm_repl_schemas:
+> Returns information about table columns published by replication.
+Sys.dm_repl_traninfo:
+> Returns information on each replicated or change data capture transaction.
+
+
+********************************STORED PROCEDURES IN SQL SERVER
+
+A stored procedure is a group of Sql statements that has been created and stored in the
+database. Stored procedure will accept input parameters so that a single procedure can be used
+over the network by several clients using different input data. Stored procedure will reduce
+network traffic and increase the performance. If we modify stored procedure all the clients will
+get the updated stored procedure
+In SQL we are having different types of stored procedures are there
+a) System Stored Procedures
+b) User Defined Stored procedures
+c) Extended Stored Procedures
+System Stored Procedures:
+System stored procedures are stored in the master database and these are 
+starts with
+a sp_ prefix. These procedures can be used to perform variety of tasks to support Sql server
+functions for external application calls in the system tables and use to perform many
+administrative and informational activities.
+
+Ex: sp_helptext [StoredProcedure_Name]
+
+
+User Defined Stored Procedures:
+User Defined stored procedures are usually stored in a user database and are typically designed
+to complete the tasks in the user database. While coding these procedures don’t
+use sp_ prefix because if we use the sp_ prefix first it will check master database then it comes
+to user defined database
+Stored procedure are modules or routines that encapsulate code for reuse. A stored procedures
+can take input parameters, return tabular or scalar results and messages to the client.
+Extended Stored Procedures:
+Extended stored procedures are the procedures that call functions from DLL files that an
+instance of Microsoft SQL Server can dynamically load and run. Now a day’s extended stored
+procedures are depreciated for that reason it would be better to avoid using of Extended Stored
+procedures.
+Why use Stored Procedures?
+> Rewriting inline SQL statements as Stored Procedures
+> Compilation and storing of the query execution plan
+> Enabling of conditional and procedural logic
+> Centralized repository for DML and DDL code enabling code reuse
+> Protection from SQL Injection attacks
+> Enabling of strict security model
+> Readability
+
+
