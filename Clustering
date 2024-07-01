@@ -1,0 +1,74 @@
+now customer asking on server level for high avalibility,
+cluster is a instance level or server level feature
+there is no data sync in the cluster level
+in cluster will call as resources
+--> group of resources
+clustering is one to many
+clustering is a automatic fail over
+all resources will move to on secondary node
+
+
+--> primary node is called active node
+--> secondary node is called as passive node
+
+on which node is running is called active node
+
+--> if one app (sql server) is running cluster setup that is called active passive node
+--> if multiple application (sql server) are running on the multiple nodes that is called active active setup
+
+--> there is a private communiton b/w all the nodes with the help of heartbeat
+--> heartbeat is ntg but but a private communication b/w the nodes which will happen every 5 seconds
+--> in cluster we have quorum this is act has a master in cluster setup
+quorum will decide who is the next secondary node
+--> how to make active-active to active-passive with the help of failover
+
+cluster -setup -pre-req
+
+--> windows server failover cluster (wsfc)
+--> sql server failover cluster (ssfc)
+--> failover ckuster instance (fci)
+
+lets setup: 
+
+we need to enable the 2 adapater for each server
+
+in sql we have to types of installation
+1. standlone
+2. cluster level
+
+for first server we select the new sql server cluster insatllatiom
+for second server we select the add node to cluster
+
+
+in server configuration we select the service account for :1 sql server database 2. sql server agent   startup type should be manual imp
+
+in database engine select current user and service account as well
+
+what is preffered ownwer and possile owner
+--> if customer is saying the application are running slowly, execution is very slow
+--> immedialte will check outlook any teams or windows or network upgrading I yes then go to cluster check preferred owner of node
+--> go to failover wizard select sql server in bottom we can see summary, resources and go to resource tab go to other resource right click advanced tab we able to nodes
+
+
+where we can see the error--> information details, cluster events, dependency report
+
+preferred owner means application can run on aparticular node on cluster setup
+but still there will be a preferred owner, among this nodes if we have 3 nodes cluser setup application out of this 3 nodes 1 node will be preffered node, then resource like run smoothly because of available more resources
+
+possible owners--> in case of failover that node should be in the possiblw owner list then only you can failover, if not it is not possible to failover
+
+how many ip we need to config sql clusterfor 2 nodes
+1 public
+heartbeat node 1
+public node2
+heartbeat node 2
+windows cluster 1
+sql cluster ip
+
+formula -> 2n + 1 + no of sql application
+
+when any thing goes wrong we need to run validation cluster or view validation report
+this is a downtime activity
+
+
+there are some error threshold limit and network error
