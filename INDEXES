@@ -1,0 +1,166 @@
+
+> An index is a collection of pages associated with a table (or view) used to speed retrieval of
+rows from the table or enforce uniqueness
+Index designed to improve the query performance of SQL Server
+Note: Indexes store data\pages internally in a formate of B-tree structure.
+
+Why Use an Index?
+Use of SQL server indexes provide many facilities such as:
+• Rapid access of information
+• Efficient access of information
+• Enforcement of uniqueness constraints
+
+Types of indexes:
+1. HEAP TABLE
+A table without having any indexes called as HEAP table"
+Heap table also called as "TABLE SCAN"
+When Use a Heap:
+> An index can be an unnecessary storage and maintenance overhead. (Eg: Audit Log)
+> Using a table scan to find data can be quicker than maintaining and using an index. (Eg: less
+rows)
+> Frequently rows are added, deleted, and updated. The overhead of index maintenance can be
+more costly than the benefits.
+> Contain predominantly duplicate data rows. A table scan can be quicker than an index lookup.
+
+
+2. CLUSTER INDEX:
+1. A common analogy for a clustered index is a phone book
+> Clustered indexes are the cornerstone of good database design.
+> A poorly-chosen clustered index lead to high execution times and storage space.
+> One clustered per Table. As only one physical way to store data.
+Note:
+> In cluster index data always stores in databases which are at leaf level.
+> Index data always stores at root and intermediate levels where it contains only index pages.
+
+
+Note:
+> Primary Key by default creates a clustered Index. But whereas cluster index never create
+primary key on table.
+If delete primary key cluster index deletes automatically.
+How to find list of indexes?
+Select * from Sys. Sysindexes
+Columns:
+Ind id
+Index name
+Cluster index syntax:
+CREATE CLUSTERED INDEX [INDEXNAME] ON [dbo]. [TABLE NAME]
+(
+[COLUMN NAME]ASC
+)
+Note: Per table can create only one cluster index. The reason can arrange data physically in 1
+way.Mutliple physical ways are not possible
+
+
+How SQL store Clustered Index Table?
+All table data are stored in Data Pages
+
+
+
+Create Clustered Index issued?
+Data pages are ordered by key
+Index Pages are organized as B-Tree by index Key
+> Each row in index page contain 2 information
+
+1. Index Key Value
+2.6 byte page pointer [Address reference at bottom level in page for next page]
+
+
+Limitations:
+Which column can be Clustered key?
+> Columns in WHERE clause
+> To return a range of values by using operators (BETWEEN, >, >=, <, and <=). Once first row is
+found subsequent indexed values will be physically adjacent.
+> Columns used in ORDER BY or GROUP BY clause.
+> The data values in the rows are already sorted. This improves query performance.
+> Columns used in JOIN
+> Return large result sets.
+> Columns used frequently in sort operation
+> Data retrieved from a table already sorted. (Saves sort cost)
+> Are frequently accessed sequentially.
+
+
+Which columns can’t be Clustered key?
+> The data in the indexed columns will change frequently.
+> Changes to a clustered index mean that the entire row of data must be moved to keep the
+data values of a row in physical order.
+
+
+3. NON CLUSTER INDEX:
+> In non-cluster index data pages stores in storage location instead of leaf nodes
+> Only pointer address maintain in leaf level and index pages gets created in root, intermediate
+level and leaf level as well.
+> In this index type performance is not faster compare to cluster index due to multiple levels of
+search.
+
+
+Per table:
+SQL 2005 ONWORDS: 1 CLUSTER+249 NON CLUSTER INDEX MAX
+SQL 2008 ONWARDS: 1 CLUSTER+999 NON CLUSTER INDEX MAX
+
+
+DIFFERENCE BETWEEN CLUSTER & NON-CLUSTER:
+1. Only one clustered index per table, where as you can have more than one non cluster index
+2. Cluster index is faster than a non-clustered index, because, the clustered index has to refer
+back to the table, if the selected column is not present in the index.
+3. Clustered index determines the storage order of rows in the table, and hence doesn't require
+additional disk space, but whereas a Non Clustered index is stored separately from the table,
+additional storage space is required.
+
+
+3. UNIQUE INDEX
+> This is the type of index where it did not allow duplicate values on created column.
+> This type of index allow UNIQUE null value but not multiple null values.
+Syntax:
+CREATE UNIQUE NONCLUSTERED INDEX [INDEXNAME] ON [dbo]. [Table name]
+(
+[Column name] ASC
+)
+Note: Can create unique index in cluster index as well .But there is no use as cluster index
+properties only applies for the tables
+
+4. COMPOSITE INDEX
+When you include more than a column at the time of index creation called as COMPOSITE index
+Or
+Can configure single index more than one column (Multiple) called as composite index
+> Can configure cluster index on multiple columns.
+> Max 16 columns can include in a part of 1 composite index.
+Note: Reduces number of index creation and storage space. Improve performance as well.
+5. COVERING INDEX
+> If the query include all the columns in a table with indexes called "COVERING index".
+> All columns should include as a part of the indexes if we miss one column then it became
+composite index.
+> Reduces DISK I\O contention and improve the query performance.
+
+
+6. PARTITIONED INDEX: [SQL server 2005]
+> Introduced in SQL server 2005
+> Partitioned Index are created over Partitioned Table.
+> Partitioning can improve performance by distributing data across files, reduce contention, and
+increase parallel IO operation.
+
+
+FILL FACTOR:
+
+> It tells how much percentage of index data need to fill in index pages [ROOT and intermediate
+levels]
+> A fill factor is reserved free space on each leaf level page which is used for future growth of
+data or index in table and reduces the page splits.
+Assign Fill factor: right click on server> properties > database settings> default index fill factor>
+provide the value
+By default fill factor value is: 0
+Note: As per MS recommend fill factor always set 80% and rest of 20% used for index
+Maintaince.
+PAD INDEX:
+> This is depends on fill factor percentage value It tells how much percentage of data need to fill
+in data pages [Leaf levels]
+> By default there is no value and it always depends on fill factor parameter.
+Note: Without enabling or set fill factor pad index not possible to enable.
+
+
+WHAT IS INDEX SEEK AND INDEX SCAN?
+INDEX SCAN: It scans all the rows in table and can we consider as a table scan. Which takes long
+time generally to retrieve data.
+INDEX SEEK: Only search for qualified rows in SQL Server and it is always faster than index scan.
+> If huge insert\update\delete happens what happen to pages and indexes?
+The pages gets effected with fragmentation due to huge insert\update or delete
+
