@@ -1,0 +1,168 @@
+alwayson is combination of log shipping and mirroring
+it is data level feature, always on introduced on 2012 version'
+
+always has only have data level feature'
+
+setup:
+
+we primary replica and d=secondary replica along this listener
+
+in always on app cant directly connect with the data base in b/w we have lister its act like as load balancer
+
+lister route the traffic between the primary replica to secondary replica
+all insert, update and delete operation will direct to primary replica, backup and select operations are directed to sencondary replica
+
+
+Dis-advantage of always on
+--. in always on is failover the whole avalibility group
+
+always on is one to many feature
+in always on we have 2 types modes
+1. synch commit
+2. asyn commit
+
+in interview asking, in your orginastion how they gone setup your ag group
+
+in my organization we have 3 replicas out of 2 secondary replica one is configured with sync and another replica configured with asymc commit
+
+as dr solution if we setup sync commit it will take lot time to reach server because it send acknolege ment to another server that we use 1 sync we will use another will use async for secondary server
+
+always on pre-re:
+1. we need cluster setup
+2.sql server should 2012 version above
+3.alwasy feature will be enabled
+4. need endpoints
+5. need lister ip addres and name
+6. db recovery mode is full mode
+7. take one full backup before seeting of always on
+
+
+
+for always on no need of sql server agent you be run , n=but need to maintananince jibs to run
+
+
+after connecting to instances-> go to ag grup expand , now go to sql server configure select instance check always on tab
+ok , then restart the server, do same on server 2
+
+now lets create 3 new dbs
+
+step 2- we need to intailize the secondary db
+--> take full and log bakup , that you want add to Ag group
+--> now copy the backup files and paste into secondary server with hidden share
+--> now restore backup with no recovery in secondary server
+
+--> now got primary server ag grop right click -> new give name agsetup
+
+how many replicas we can add in ag --> it depends on version we using for 2012 we can add 4 replica, 2014, we can add 4 replicas, and from 2016 onwards we can add 8 replicas
+
+in org generally we use 2 secondary replicas 1 with sync commit and another ine with asyn commit
+
+port : 1433
+
+in specify replicas tab --> we can see all the tabs replicas, endpoints, backup preference, listerer, read-only-routing
+
+
+remember -> in nterview they will ask you me not able to take the backup and user cant read the data from server always on case-->
+--> while specify the roles we need to selec the options to yes , this is the one reason and another might be server down
+
+--> what is the diff b/w fci and and always on
+fci is an insatance level featre and always on is a database level feature, fci need shared storage or cluster storage, where as always on needs standard storage and for both we need winows cluster
+
+
+the service will be available only on the primary node, in the always on the services will available on all replicas
+
+in the fci there is no concept of sync , were always on has sync 
+
+fci need cluster instance
+
+always need the standolne instance
+--> sync commit, listener, endpoints
+
+
+--> in interview they will ask, automatic failover is not working on always on what misht is reason..
+the database movement is not sync the automatic failver winn not not work
+
+the log file is an inaccessible the server may down
+
+-> the primary log file is full do means always on so it is not working 
+-> if you see play button means the db is healthy
+
+--> to monitor the always on--> show dashboard
+right click on ag show dashboard
+
+--> in interview they may ask you , my ag group is on resolving state, how to trouble shhot, when it goes resolving state when the resources are down, how to fix this issues ---> 
+
+--> first we have to check the cluster events first, check information details try to failover manually, then try to restart the secondary replica
+
+--> check sync by inserting the data 
+
+--> some times we get some request, customer is asking to add db or remove from the ag
+
+go to primary instance--> availalibity data-> right click
+remove the db, as well on secondary server, from secondary server we have to delete the db-> delete , close connections
+
+now how to add db to ag--> 
+1 one method is taking full backu, log backup and resotore in secondary db, second is auomatic seeding, introduced in 2016
+
+, but automatic seeding is not remomded for , because it take the backup from other locations , in case there is no space means the backup will fail, but what is mandatory, step adding new db to ag group
+
+--> go to ag right click, next
+
+--> manually adding db to ag
+--> take full and log backup
+--> copy the files of backup, share with hidden share resotre with no recovery
+
+---> in sql server migration
+--> if you want migrate ag for server, but you want to migrate imagine it 2012 , customer asking to migrate to 2019
+the existing ag, you can not do it migration, upgradation is it will allow you for existing setting, but in generally for migration what we do, will install it from starch, again you to setup completer ag, why because we have to install whole instance right, you installing from stracth, this running on2012, now customer asking 2019, now simpy install 2019 cluster setup, and install sql server 2019, upgradtion we can do that, from these itself version to version
+
+--> can we have configured always on and log shipping and replicationon same server, yes we can do it, but same db not possible
+
+--> can I setup replication of always on yes we can setup.
+
+--> in interview they will ask you what of backup are possible on the secondary replica ??
+--> can I take all types of backup in secondary, the answer is no. on the secondary I can achieve copy only backup, copy onky full backup, and log backup
+
+
+--> automation is challing task on automation jobs
+--> some jobs they run from the primary
+--> when you do failover the next step is immediately we have to disable the job on the recent primary, and enable the job on recent secondary so it wont create any problem
+
+-- we can only take the copy only backup and log on secondary -- what is that reason.. if we will take full bcakuo means it reset the dcm pages, means its a write operation, but secondary is readable copy only. that y its does not allow . you can perform rite operation on secondary.
+
+in copy of baclup, it wll not touch the dcm pages, so that we can able to do this king of backups
+
+otherwise we face the problem, while doing the failover, so the logins are play crucuial role in always-om, so interviewer will ask lie this, doing failover application is not working, what might be the reason --- the application is not connecting to the recent secondary, reaon--> logings are syncrinized in always on ---> no
+
+--> lets say, in primary server, insta db is there, in logins swathi login is there , imagine swathi is having access on insta, so swathi having 124 sid , in the insta db-also sqathi user sid will be 12
+, matching so swathi can connect to insta db,
+
+now you do failover, imagine failover happened --> now what happened, the swathi login is present on secondary, but when you create swathi login now here sqlthi login as a different sid in the insta user, then swlathi has a primary db sid here insta db are sync but logins are not sync , so when you crete login sid
+
+select * from sys.login in server 1
+
+swathi sid is 0xdfg
+
+do the same in server 2 you able to see sid
+
+
+server-2
+ select * from sys.logins
+
+the sid are same because of domain system
+
+--. let me create a new login on the primary server give sql server auth password, serer roles usermapping give access to insta db 
+
+now query select * from sys.login -> check login sid created one, do the same on server 2 but not givr ay server roles
+
+after creating the logins are diff sid are diff now
+ 
+
+while restoring the db from prod to non-prod for always on --> remember first we need to remove db from always on
+--> then restore with no recovery , for orphan user we need to fix with create one command
+
+
+while adding the file if there is mismatch of drives name or path , the db will go to suspended state, then we have to manually restart the db.
+
+--> if we face any latency issue, restart the end points in always on. it help you to fix latency issue mostly
+
