@@ -1,0 +1,12 @@
+Tempdb Full:
+1) Increase the File Size (if storage is available).
+2). Add NDF file from another/same drive.
+3) Find out the transaction which is occupying more space in Tempdb and troubleshoot or kill
+that transaction based on approval
+4) Shrink the Data File of Tempdb (if no OPEN transactions are in progress)
+DBCC OPENTRAN \sys.dm_db_session_space_usage
+5) DBCC FREEPROCCACHE
+> Command will clear the procedure cache in memory.
+> There is a risk involved with this, it can affect next procedures to be reparsed and compiled.
+Also it might not give accurate results for DMV's.
+6) Restart the instance and it resets the tempdb size to last stated value in sysdatabases
