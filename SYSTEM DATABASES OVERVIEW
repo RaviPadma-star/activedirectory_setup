@@ -1,0 +1,49 @@
+MASTER DATABASE: [DB ID: 1]
+In SQL Server system object data stores in master database logically and physically in resource
+database.
+EX: any TABLE OR VIEW STARTS WITH sys.
+> Whenever restart SQL Server ; SQL Server engine checks for MASTER MDF and LDF path from
+configuration manager>advanced> start up parameter> MDF and LDF file location
+
+2. MODEL Database [DB ID: 3]
+> Just act as a template whenever we create user database.
+> When you create any user database get all the below properties from model database.
+Ex:
+File
+File size
+Recovery model
+Collation
+
+MSDB [DBID: 4]
+> SQL Server agent related information stores into MSDB
+Information stores:
+Jobs
+Maintaince plans
+Alerts
+Operator
+Database mail
+Log shipping
+Backup
+Restore
+
+
+> Whenever restart SQL Server services then Tempdb MDF and LDF reset to original size by
+flushing all the temp information.
+> Tempdb always inherit properties from MODEL database except Tempdb MDF size: 8 MB and
+recovery model: Simple
+> By finding Tempdb created date by using SP_HELPDB or db> right click properties or Tempdb
+mdf, ldf file date creation: can conclude that is the time when SQL Server services restarted.
+Tempdb Stores:
+Cursors
+Triggers
+
+
+5. Resource database: [DB ID: 32767]
+> New feature in SQL Server 2005 version onwards
+> Physically stores sys object information
+> Any service pack\hot fix\cu entries or updates at resource database
+> Upgrade SQL Server entries happen in Resource database
+> Read_only database
+> Hidden database
+> No entry in master database related to resource database
+
