@@ -1,0 +1,81 @@
+check services are running in server
+minimum 3 gb space shoulb be available
+check all db or online and offline take scrrenshot -> sp_helpdb  -> select * from sys.atabases
+check versions @@version make sure we able see correct, if version are not same it going to fail
+in some case patching will fail, in this case we need to remove the patch and fix the issue check select @@SERVERNAME
+
+if in case server name is different the we need to fix with the
+sp_dropserver 'servername' and add it sp_addserver 'servename', local
+
+-----upgradation
+in place upgradation as some draw backs, there is lot of challenges with in place upgradation
+we cant directly upgrade the from lower version to higher version, if we have 2005server to 2022 to upgrade it not possible with one go
+upgradation is a downtime- upgradation takes a lot of restarting
+rollback is not possible, before upgradtion need to take vm shapshot
+in sql server there is no rollback
+edition should be same
+
+pre-checks--
+patching pre-req
+check services are running in server
+minimum 3 gb space shoulb be available
+check all db or online and offline take scrrenshot -> sp_helpdb  -> select * from sys.databases
+check versions @@version make sure we able see correct, if version are not same it going to fail
+in some case patching will fail, in this case we need to remove the patch and fix the issue check select @@SERVERNAME
+before migration run msi, msp files 
+after success full check server name, and compatability level with the help of sp_helpdb, some time it will show 15 we need to change the compatibility level..with the help of alter database databsename set compatibility_level = 160  --imp step
+  
+if in case server name is different the we need to fix with the
+sp_dropserver 'servername' and add it sp_addserver 'servename', local
+
+---sidebyside--upgration
+check services are running in server
+minimum 3 gb space shoulb be available
+check all db or online and offline take scrrenshot -> sp_helpdb  -> select * from sys.atabases
+check versions @@version make sure we able see correct, if version are not same it going to fail
+in some case patching will fail, in this case we need to remove the patch and fix the issue check select @@SERVERNAME
+before migration run msi, msp files 
+after success full check server name, and compatability level with the help of sp_helpdb, some time it will show 15 we need to change the compatibility level..with the help of alter database databsename set compatibility_level = 160  --imp step
+
+--advantages rollback is possible 
+we can upgrade the lowest version to highest version with one go
+down-time activity is depends upon the process we doing 
+1--type is we can copy the backup file and restore on the destination server
+
+pre-req--: install the target version of destination server
+make sure we have same drives like backup drive , log drive the same thing and name should be same in target server
+-before installing the sql server in target machine we have to compare all the drives with source and target destination
+-- in source server how many drives are there and target server how many drives are there
+-- if drives are there in source same drives are need to be in destination server
+-- we cant the see the same drives in servers we request the windows team and storage team to add it
+-- and check database sizes how much it will take and there is connectivity between the 
+ servers
+- first install the sql server 2022 in target server
+then copy the backup files from the 2019 server source server then paste in target server with the c drive backup folder
+
+--> now take the full backup of databases
+copy files from source to destination server with the help of \\192.168.1.1\C$
+
+now restore the backup file
+then now  move logins--> method to move logins--> sp_who2 for instances running or not
+		1--> while restoring the db only database user will come but not logins
+			for this we need to setup the orphan users
+			check----> sp_change_users_login 'report'
+		2---> four ways to fix orphans user
+			1-> create a login with user sid
+			2-> update_one
+			3-> auto_fix
+			4-> sp_helprevlogin
+
+with the help of sp_helprevlogin we copied the the script for permission of logins from source server and output
+pasted n destination server
+
+--> now we need to migrate jobs and alerts operators 
+--> rememnber we cant migrate the maintence plans --> we need to create the maintence plans manually
+
+--> now to source server we migrate the jobs first with the help of hit f7 in source server, select the required jobs and right click script crete- copy the output and go to target server open new query paste and replace all the computer name with target server
+
+--> now operators go to source server hit f7  -> script out and paste in target server, best practice is operatos, alerts, jobs --check computer in all scripts
+
+last step in migration check compatability level with sp_helpdb  -> now have to inform the application team on new target server
+
