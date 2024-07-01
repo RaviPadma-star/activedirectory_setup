@@ -1,0 +1,196 @@
+Query is running slow or query tuning:
+
+1. Check any open Tran are there by using
+DBCC OPENTRAN
+2. Check for any blockings are there?
+If yes then according to your project process we find blockings and speak to apps team to
+confirm which SPID required to kill with approvals via email.
+KILL SPID
+If no blockings then?
+
+
+3. Check for any deadlocks
+Note: By default SQL Server db engine will not capture any deadlock information DBA team
+need to enable trace flags.
+DBCC Traceon (1222 or 1204, -1)
+
+4. Check for any query execution plan or cost based plan.
+Execution plan display:
+1. Physical operation (Scan type)
+2. Logical Operation
+3. Estimated I\O COST
+4. Estimated CPU COST
+5. Estimated number of executions
+6. Estimated number of rows.
+7. Cache Size
+8. Rebinds
+9. Rewinds
+
+
+Execution plan definitions:
+Actual Execution Plan - (CTRL + M) - is created after execution of the query and contains the
+steps that were performed
+Estimated Execution Plan - (CTRL + L) - is created without executing the query and contains an
+approximate execution plan
+> Rebind: Provides number of join operations
+> Rewind: Provides number of join operations has changed since.
+5. Check whether any lock types are in the tables
+SP_LOCK or select * from Sys.dm_tran_locks [DMV]
+
+
+7. Check for FRAGMENTATION LEVEL on the tables.
+
+
+If We FRAGMENTATION level
+1. <5: No action and indexes are good.
+2. If >5 and <30: Index need to reorganize
+Alter index indexname on table name reorganize
+3. If >30: Index need to rebuild
+Alter index indexname on table name Rebuild
+If no FRAGMENTATION
+
+8. Check for any missing indexes by using
+Select * from sys.dm_db_missing_index_details
+
+
+9. Check for any unused indexes in a table
+Select * from sys.db_unused_index_details
+
+
+10. Check CPU and memory utilisation.get Top 10 queries which are consuming more CPU and
+memory in the Sql then inform share the details to apps team.
+
+
+11. Run profiler or perfmon tool to capture events or counters depending on type of
+parameters.
+
+
+12. Check any disk or I\O or Network related issues.
+13. Run the DTA [Database tuning advisor] to get any suggestions to improve the performance
+
+
+From query side:
+1. Check the query (select) contains no_lock functionality or not.
+2. Check whether any complicated loops or joins or triggers used or not.
+Note: How to find which SQL Server instance is consuming more CPU or memory when multiple
+instances in a single server.
+Go to task manager> view > select columns > Select PID [Process id]. Take PID for SQL Server
+and compare with configuration manager> Process id for specific instance. Compare both PID
+for task manager and configuration manager > Then conclude the instance name which takes
+more memory or CPU…..
+How to find SPID level inside the instance?
+Use SP_WHO2 or SP_WHO3
+
+
+
+
+*************************HIGH CPU ISSUE
+
+1. Go to task manager> check whether SQL Server .exe (SSMS.EXE) is using more CPU or not?
+If using then look further investigation from inside Sql server else if any other resource .exe is
+using inform to concern team.
+Check any long running or any open transactions are running in SQL Server causing high CPU.
+2. If it’s SQL server then open perfmon and add the counter for
+Processor: % Privileged time,
+% Processor time
+%user time
+If you see the %privileged time to be high like covering around 40% and above then it could be
+some driver issue.
+
+
+
+Note: Per processor 156 worker threads can create.
+3. First and very important one is to know what’s the architecture i.e. 64 bit (X64 or IA 64) or 32
+bit(x86):
+Check the configuration using command: Xp_msver
+Note: -Improper index or missing index or fragmented index which lead to query to run longer
+.It leads to high CPU.
+4. Check if there are any trace flags enabled:
+Dbcc tracestatus (-1); It’s always good to check the reason of enabling the trace flags, if enabled.
+5. Check the below mentioned SQL parameters
+
+
+sp_configure 'advanced', 1
+go
+Reconfigure with override
+go
+sp_configure
+go
+Priority Boost: - it’s not recommended to be enabled as it can cause high CPU utilization. If it’s
+enabled (value =1) please disable (set value to 0) it - it’s a static parameter which needs SQL
+restart
+
+
+Max degree of parallelism: - Although this parameter doesn’t make much of a difference but
+sometimes I have seen SPID stuck in ACCESS_METHODS_SCAN_RANGE_GENERATOR, cx packet
+or other parallel wait types. If you see any such waits when you run this query:
+
+Note: - If you have more than 8 processors, please make sure the max degree of parallelism
+parameter is 8 or below 8.
+7. Run CPU related counters by using perfmon tool
+8. DBCC FREEPROCACHE: prepares new plan by query optimizer and recompilation starts
+again...Which may improve the performance and reduce CPU utilization.
+9. Check with developer on designing of query or Application design or any further bugs...
+
+
+SQL Server - Max Degree of Parallelism (MAXDOP):
+> Limit the number of processors to use in parallel plan execution
+
+What all benefit from parallel execution plan:
+ Complex/Long running queries – During query optimization, SQL Server looks for queries
+that might benefit from parallel execution. It distinguishes between queries that benefit from
+parallelism and those that do not benefit, by comparing the cost of an execution plan using a
+single processor versus the cost of an execution plan using more than one processor and uses
+the cost threshold for parallelism value as a boundary point to determine short or long query. In
+a parallel query execution plan, the INSERT, UPDATE, and DELETE operators are executed
+serially. However, the WHERE clause of an UPDATE or a DELETE statement, or the SELECT part of
+an INSERT statement may be executed in parallel. The actual data changes are then serially
+applied to the database.
+ Index data definition language (DDL) – Index operations that create or rebuild an index
+(REBUILD only, not applicable to REORGANIZE), or drop a clustered index and queries that use
+CPU cycles heavily are the best candidates for a parallel plan. For example, joins of large tables,
+large aggregations, and sorting of large result sets are good candidates.
+
+
+Other Operations – Apart from the above, this option also controls the parallelism of
+DBCC CHECKTABLE, DBCC CHECKDB, and DBCC CHECKFILEGROUP.
+
+--The max degree of parallelism option is an advanced option
+--and let you set only when show advanced options is set to 1
+sp_configure 'show advanced options', 1;
+GO
+RECONFIGURE WITH OVERRIDE;
+GO
+--configuring to use 8 processors in parallel
+--setting takes effect immediately (without restarting the MSSQLSERVER service)
+sp_configure 'max degree of parallelism', 8;
+GO
+RECONFIGURE WITH OVERRIDE;
+GO
+By default, when SQL is installed on a server, the parallelism setting is set to 0 meaning that the
+optimizer can utilize all the available processors to execute an individual query. This is not
+necessarily the most optimal setting for the application and the types of queries it is designed
+to support.
+
+
+ Scenario 1 – For OLTP application, a typical setting is 1 would help. The reason for this is
+that in an OLTP environment, most of the queries are expected to be point queries which
+address one or a relatively small number of records. Such queries do not need parallelized
+processing for efficient execution. If there are specific queries which have a need for a setting
+greater than 1, then the source code needs to be examined to see if a MAXDOP hint can be
+availed.
+
+
+ Scenario 2 – For OLAP application, the setting should typically be default 0 (up to 8
+processors) or be greater than 1, because each queries, such application will use, will typical
+target thousands of, millions of records and also there might a scenario when you drop the
+index before ETL operation and re-create it once refreshed data is uploaded in typical data
+warehousing application. There will definitely be performance advantages in using multiple
+processors to do these works in parallel fashion.
+
+
+Note: Using a setting of 0 in these applications is not recommended, especially when there are
+more than 8 processors in order to keep the coordination costs, context switching down to
+manageable levels. It is typical to start with a value of 4 and experiment with the reporting
+queries to see if this needs to be adjusted upwards.
+
