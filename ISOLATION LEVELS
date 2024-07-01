@@ -1,0 +1,28 @@
+> Isolation levels in SQL Server control the way locking works between transactions.
+> SQL Server supports the following isolation levels
+• READ UNCOMMITTED
+• READ COMMITTED [THE DEFAULT]
+• REPEATABLE READ
+• SERIALIZABLE
+• SNAPSHOT [SQL 2005 NEW FEATURE]
+
+
+
+Also before we go any further it is important to understand these two terms….
+1.Dirty Reads – This is when you read uncommitted data, when doing this there is no guarantee
+that data read will ever be committed meaning the data could well be bad.
+2. Phantom Reads – This is when data that you are working with has been changed by another
+transaction since you first read it in. This means subsequent reads of this data in the same
+transaction could well be different.
+
+• READ UNCOMMITTED
+> This is the lowest isolation level there is. Read uncommitted causes no shared locks to be
+requested which allows you to read data that is currently being modified in other transactions.
+It also allows other transactions to modify data that you are reading.
+> As you can probably imagine this can cause some unexpected results in a variety of different
+ways. For example data returned by the select could be in a half way state if an update was
+running in another transaction causing some of your rows to come back with the updated
+values and some not to.
+> To see read uncommitted in action let’s run Query1 in one tab of Management Studio and
+then quickly run Query2 in another tab before Query1 completes.
+
