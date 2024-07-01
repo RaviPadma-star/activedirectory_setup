@@ -1,0 +1,108 @@
+What is execution plan and explain it?
+Execution plan graphically displays the data retrieval methods chosen by SQL Server. It
+represents the execution cost of specific statements and quires in SQL Server. This graphical
+approach is very useful for understanding the performance of the query.
+What is an execution plan? When would you use it? How would you view the execute
+
+
+Execution plan displays:
+• Physical operations
+• Logical operations
+• Actual Number rows
+• Estimated I/O cost
+• Estimated CPU cost
+• Number of Executions
+• Estimated Number of Executions
+• Estimated Operator cost
+• Estimated Subtree cost
+• Estimated Number of Rows
+• Estimated Row Size
+• Actual rebinds
+• Actual rewinds
+• Key lookup
+• Nested look up
+• Index seek
+• Index scan
+
+**********************************TEMPDB ARCHITECTURE
+What is Stored in Tempdb?
+Tempdb is used to store three different categories of temporary data:
+– User Objects
+– Internal Objects
+– Version Stores
+
+User Objects:
+• Local and global temporary tables and indexes
+• User-defined tables and indexes
+• Table variables
+• Tables returned in table-valued functions
+Note: These lists are not designed to be all inclusive.
+Internal Objects:
+• Work tables for DBCC CHECKDB and DBCC CHECKTABLE.
+• Work tables for hash operations, such as joins and aggregations.
+• Work tables for processing static or keyset cursors.
+• Work tables for processing Service Broker objects.
+• Work files needed for many GROUP BY, ORDER BY, UNION, and SELECT DISTINCT operations.
+• Work files for sorts that result from creating or rebuilding indexes (SORT_IN_TEMPDB).
+• Storing temp
+
+
+Tempdb doesn’t act as an other databases:
+• Tempdb only uses simply recovery model.
+• Manydb options not be able to change.
+• Tempdb may not be dropped, attached or detached.
+• Tempdb may not backed up, restore, can’t implement any HA options
+
+Types of Tempdb Problems:
+• Generally, there are three major problems you run into with Tempdb:
+1. Tempdb is experiencing an I/O bottleneck, hurting server performance.
+2. Tempdb is experiencing DDL and/or allocation contention on various global allocation
+structures (metadata pages) as temporary objects are being created, populated, and dropped.
+E.G. Any space-changing operation (such as INSERT) acquires a latch on PFS, SGAM or GAM
+pages to update space allocation metadata. A large number of such operations can cause
+excessive waits while latches are acquired, creating a bottleneck, and hurting performance.
+3. Tempdb has run out of space.
+
+SOLUTION:
+Use performance Monitor:
+And also DMV’S are useful what is going on Tempdb
+• sys.dm_db_file_space_usage: Returns one row for each data file in Tempdb showing space
+usage.
+• sys.dm_db_task_space_usage: Returns one row for each active task and shows the space
+allocated and deallocated by the task.
+• sys.dm_db_session_space_usage: Returns one row for each session, with cumulative values
+for space allocated and deallocated by the session.
+
+Monitoring Tempdb Space:
+Performance Counters:
+• SQL Server: Database: Data File(s) Size (KB): tempdb
+• SQL Server: Database: Log File(s) Used Size (KB): tempdb
+• SQL Server: Transactions: Free Space in tempdb (KB)
+DMV
+• sys.dm_db_file_space_usage
+
+Errors in tempdb running slow check in error logs:
+• Check the SQL Server error log for these errors:
+– 1101 or 1105: A session has to allocate more space in tempdb in order to continue
+– 3959: The version store is full.
+– 3967: The version store has been forced to shrink because tempdb is full.
+– 3958 or 3966: A transaction is unable to find a required version record in tempdb.
+Note: Be sure auto growth is turned on for tempdb, and ensure that you have enough available
+free disk space.
+Operations that cannot be performed on the tempdb database:
+
+> Adding filegroups.
+> Backing up or restoring the database.
+> Changing collation. The default collation is the server collation.
+> Changing the database owner. Tempdb is owned by dbo.
+> Creating a database snapshot.
+> Dropping the database.
+> Dropping the guest user from the database.
+> Participating in database mirroring.
+> Removing the primary filegroup, primary data file, or log file.
+> Renaming the database or primary filegroup.
+> Running DBCC CHECKALLOC.
+> Running DBCC CHECKCATALOG.
+> Setting the database to OFFLINE.
+> Setting the database or primary filegroup to READ_ONLY.
+
