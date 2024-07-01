@@ -1,0 +1,28 @@
+MEMORY ISSUE
+How to find SQL Server actual memory utilization?
+Steps: 1. Go to task manager> check SQLsrv.exe or SSMS.exe how much memory utilizing.
+
+2. If any other .exe is using more Memory then inform to relevant team. If SQL Server is
+consuming then go to SSMS> try to check any spid consuming more memory by using
+Select * from sys.sysprocesses
+3. If example: is Sql server is consuming 20 GB out of total 24 GB physical memory, then how to
+find actual utilization from Sql end.
+By using, DBCC memory status
+Find Value or parameter: STOLEN POTENTIAL [Shows free memory from SQL level]
+CONVERT VALUE INTO: VALUE*8 /1024/1024= Actual free memory out of total SQL Server
+consumed memory.
+19 GB free out of SQL Server memory 20 GB.
+
+
+4. Please check whether memory capping or restriction is done at SQL Server level.
+5. If not please inform apps team to raise Change record and you provide suggestion how much
+memory capping to be set dedicatedly for SQL Server.
+Always keep 80% of memory Sql server and rest of 20 % of memory to o\s out of total physical
+memory.
+6. Still memory issue, then enable the memory related counters to find the standard values.
+7. Verify the execution plans and sometimes query optimizer may prepare wrong plans which
+leads to high CPU and high memory
+To clear the plans
+DBCC FREEPROCCACHE---It clear all the plans from buffer pool
+Note: plz get approval from application team before performs the cache clear
+
