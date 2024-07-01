@@ -1,0 +1,50 @@
+Log-shipping
+
+-- log shipping is ntg but shipping of log backup files b/w the two servers
+-- log shipping is a database feature level
+-- log sshipping is basically work on backup job, copy job to destination server, restore job in destination server
+-- In log shipping we call the server as primary server, secondary server(standby server)
+-- log shipping can configured via full and bulk logged recovery model only
+
+-- lets create a one database first, insert some values
+--lets create a shared folder for copying the jobs, in c drive and give share option as every one --do this on server one
+-- now go to server to as well create a newfolder in c drive
+
+----now seeting up the log shipping
+1. Db should be full recovery model
+2. shared folder will be in primary
+3. local folder in secondary server
+4. agents must be running
+5. remove the db from regular backup job
+
+----intializing the seconday server
+
+below step is done before log shipping for the first time ::::--->
+
+1. we have to take full and log backup of primary server and copy those backup to secondary server and we have to restore the full and log backup with no recovery in the secondary server for the first time ** end**
+
+step -1 --> Take full backup and log backup in primary server
+step-2--> copy the file which we already backuped the files with the help of hidden share and after shareing to local the copy the files and paste into backup folder
+step-3 --> in primary server go to anydatabase which want participate on log shipping -> properties-> transaction log shipping option here we can schedule or intialize the secondary database
+--now we can see backup job on primary server , and copy and restore job we see on secondary server --> we can add upto 4 servers in log shipping
+
+step-4--> check the backup or not working on shared location
+step-5-> check the latency b/w the 2 servers
+
+step-6--> if customer aking the setup the log shipping we need to remove all the jobs while running on server which is running since months otherwise log-shipping will be failed, remove db from the regular backup jobs
+
+
+
+for instance log shipping will be failed due to the mismatch of lsn then immedieate soution to resume the log shipping is take the diiferent log backup and restore in the secondary server with no recovery 
+
+montior log shipping : we can see from view history and or reports transtion log shipping status, and msdb table -> system database , 11 tables will be there
+
+whta is tuf file :  when ever we changed the secondary server to full to any recovery model,  the tuf file will be created, the tuf file is responsible for track the commited and uncommited transactions
+the tuf will be created the data file location 
+
+-> if you delete the tuf file the log shipping also borken 
+
+what is wrk file: while coping the log backup from shared location to local folder in the secondary server, the log backup are being stored with the extension of .wrk once process is done the log backup extension will be changed t trn
+
+--> automatic failover and manual failover in org sometime they will do drill
+failover is ntg but excahnging the roles, log shipping is only having only the manual failover mj 
