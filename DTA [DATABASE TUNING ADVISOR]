@@ -1,0 +1,76 @@
+> The main purpose of this tool is to provide recommendations to improve the query
+performance by analysis the query [work load file] on a table in the database.
+> Database tuning advisor can analyze the performance effects of workloads run against one or
+more databases or a SQL profiler trace (they may contain T-SQL batch or remote procedure call).
+After analyzing, it recommends to add, remove or modify physical design structure such as
+clustered and non-clustered indexes, indexed views and portioning.
+Workload: a work load is set of transact-SQL statements that executes against databases you
+want to tune.
+Steps:
+• Open DTA tool
+• Save the query as file
+• Provide the path for work load file
+• Select the database
+• Start analysis.
+
+
+Note: After analysis DTA provides recommendations and then implement always on test server
+first. Check the performance and after implement on prod system.
+From DTA reports> statement cost report > Value have to check to know how much percentage
+of query faster.
+
+
+Example:
+Create table [Table] (userID varchar (55), FirstName nvarchar (55), Lastname nvarchar (55))
+; With sequence as (
+Select N = row_number () over (order by @@spid)
+from sys.all_columns c1, sys.all_columns c2
+)
+Insert into [Table] (UserID, FirstName, Lastname)
+Select
+'UserID' + right ('000000' + cast (N as varchar (10)), 6),
+'John' + right ('000000' + cast (N as varchar (10)), 6),
+'Doe' + right ('000000' + cast (N as varchar (10)), 6)
+from sequence where N <= 100000
+Select * from [Table] where Lastname='Doe299999'
+
+
+
+
+How to clear the buffers:
+DBCC FREEPROCCACHE
+GO
+DBCC DROPCLEANBUFFERS
+GO
+DBCC FREESYSTEMCACHE ('ALL')
+GO
+DBCC FREESESSIONCACHE
+
+
+Note:
+Never clear buffer until proper confirmation from application team.
+Statistics: Mainly it contains table updated information and density value information.
+Whenever we update table then statistics also updated.
+Note: By default AUTO statistics option is always true in each database.
+Drop statistics DBO. [Table]. [_WA_Sys_00000003_0F975522]
+Drop statistics DBO. [Table]. [_WA_Sys_00000001_0F975522]
+
+
+
+
+ACID PROPERTIES
+What is Transaction?
+Transaction is a set of logical unit of work and it contains one or more database operations. A
+valid transaction should be met (ACID) Atomicity, Consistency, Isolation, Durability properties.
+Atomicity: A transaction must be an automatic unit of work, either all of it data modification are
+performed or none of them is performed.
+Consistency: When completed a transaction must leave all data in consistent state. In a
+relational database, all rules must be applied to transactions modifications to maintain all data
+integrity. All internal data structures, such as B-tree indexes (or) doubled linked lists must be
+correct at end of transaction.
+Isolation: Modifications made by concurrent transaction must be isolated from the
+modifications made by the other consequent transactions. A transaction either sees a data in
+the state it was in before another concurrent transaction modified it, (or) sees the data after
+second transaction completed.
+Durability: After a transaction has completed, its effects are permanently in place in the system.
+The modification persists even in the event of a system failure.
