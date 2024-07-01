@@ -1,0 +1,105 @@
+MASTER CORRUPT:
+> Master is the most crucial database in an instance, if it is corrupt entire instance gets affected.
+Master Corrupt
+Error number: 3411
+Error Message: Timely fashion error
+112 error number for disk space
+
+Partially corrupt:
+1. If master database is corrupt, it is either completely corrupt or partially corrupt. If partially
+corrupt, instance will start with -m;-t3608 and if it is completely corrupt instance wouldn't start.
+2. Put your instance in single user mode.
+3. Restore master database WITH REPLACE option
+
+Restore database master from disk=N'F:\Master.bak' WITH REPLACE
+
+Completely Corrupt:
+1) Master database doesn't start with /m /t3608 and hence we need to rebuild the master
+database.
+Use command prompt and start rebuilding master database by enter into path of setup.exe
+[Path of SQL Server software]
+2) Rebuild master
+Start /wait setup.exe /qb INSTANCENAME=sql2005 REINSTALL=SQL_Engine
+REBUILDDATABASE=1 SAPWD=Admin123
+
+Net stop "SQL Server (instance name)"
+Net start "SQL Server (instance name)" /m
+4) Restore master database WITH REPLACE option
+Restore database master from disk=N'F:\Master.bak' WITH REPLACE
+
+
+MODEL CORRUPTION:
+Error: 5172, Severity: 16, State: 15.
+Error message:
+The header for file '\model.mdf' is not a valid database file header.
+Solution:
+Model database being one of the crucial database for new database creations and also for
+Tempdb recreation on every restart.
+If model database is corrupt it is going to affect instance functionality.
+
+
+Steps:
+1) Verify if Model is corrupt or not in Event viewer and SQL Server Error Logs.
+2) Confirm if a valid database backup exists or not using restore verify only/header only.
+3) Start instance with Master database only by enabling the trace 3608.
+Net start "SQL Server (MSSQLSERVER)" /t3608
+4) Restore the Model database from backup.
+Restore database model from disk=N'F:\Model.bak' WITH REPLACE
+5) Start instance normally by removing trace 3608
+Net stop "SQL Server (MSSQLSERVER)"
+Net start "SQL Server (MSSQLSERVER)"
+
+
+OTHER METHOD: Copy and paste model .mdf, .ndf files from other instance [Required to take
+instance offline]
+
+
+MSDB CORRUPT:
+1) Verify the reason of failure in the error logs and troubleshoot accordingly. If database is really
+corrupt then look out for an available valid backup. If backup is available restore MSDB as a
+normal user database and it would be restored.
+2) If backup is not available, then stop the instance and start the instance in /m and /t3608
+startup parameters.
+Net stop "SQL Server (MSSQLSERVER)"
+Net start "SQL Server (instance name)" /t3608 /m
+3) Connect to the Query window and detach MSDB database and delete the OS level files.
+
+SP_detach_db 'MSDB'
+NOTE: Remove MSDB data/log files from the path.
+4) Execute the script in %Root Directory%\Install\instMSDB.sql file.
+ISSUE:::: after msdb rebuild then Sql server agent not able to start? How to resolve
+Solution:
+sp_configure 'show advanced options', 1;
+RECONFIGURE;
+sp_configure 'Agent XPs', 0;
+RECONFIGURE;
+
+
+
+TEMPDB CORRUPTION:
+1. If Tempdb corrupt instance wouldn't respond and it would be in hung state equal to crash.
+2. To resolve, restart Sql server instance so that Tempdb files will be recreated.
+Error number: 824 state: 19
+Note:
+1. If Tempdb log file is full then SQL Server instance did not allow any connections.
+2. If model database is corrupted at the same time Tempdb corrupt, then even Tempdb did not
+create after restart.
+Trace Flags:
+-t: refereing startup
+-d: fully qualified path of data file
+-e: error file
+-l: log file
+-c: quick start of instance than regular process
+-m: single user mode
+-s: sqlserver.exe
+-n: start instance name then the information will not trace in event viewer
+
+
+Trace Flag 3607:
+Starts SQL Server without recovering any databases
+
+Trace Flag 3608:
+Starts SQL Server, recovering master only
+
+User Database Status -32768:
+Starts SQL Server without recovering the user database.
