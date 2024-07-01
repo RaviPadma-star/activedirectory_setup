@@ -1,1 +1,47 @@
+merge publication and peer to peer are by-directional replications
+
+when we change the done on publisher side it will reflect on subscriber and vice-versa, when ever any changes made from subscriber side it will also reflect the same in publisher side
+
+Demo-->
+
+create a one or more tables for merge replications--- no primary key is mandatory
+
+when setting up the merge publication it will add extra rowguiid for tables
+
+
+remember while setting up merge in subscription part there is wizard called subscription type for 
+
+-> conflicts detection
+--> conflicts resolutions
+
+in this we have to select the subscription type -> client first
+
+if you remove the article from existing table , it will stop the sync , but it will not remove the table from sub
+
+where we can add artiles --> local-pub -> properties-> article tables-> here we add and remove
+
+if you add any article and or remove artice it will sync will be stop and agent must be restarted
+
+what wil be create in repli folder--> unc-> universal anming conversiton
+
+generally in prod, we don't do the re-intailziton of snapshot process -remember
+
+
+in interview--> have you encounterd any problem with rep;icatiom
+--> primary key violations for transaction replication
+, in such error we have to check , go to the replication monitor, go to sepecfic agents all subscription agent view details in subscriber side, on specific we we get primary key violations
+--> developers may can un-knowgloy they insert into the subscriber side
+
+error may like: ex: violation of primary key constarints
+now go to the pubslisher side we need to delete the record to resolve the issue
+
+sometime, the snap shot may kept in not running, they wanted they do or any dba is stopping wantedly check emails, or user asking to stop we can see some group emails
+
+in case any data consistency error, what we have to do
+
+some manager or lead will tell you check containuos on data consistency error: simply go the subscriber-> agent-profile
+
+
+when we re-intailize thae on snapshot
+take this serious or do on non busniness hours, this will adding the artice we may do it
 
