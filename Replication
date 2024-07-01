@@ -1,0 +1,76 @@
+1-> customer is asking hey can you replicater or sync on 10 tables , I don't want to sync whole db, only sync the respective part or object in the db
+2-> can you replicate on the object or table answer is replication
+
+3--> replication is a high level object feature
+
+4--> replicating the sync or the few objects or tables like stored procedure we can choose the replication
+
+
+How replication works____> based on ----> 1. publisher, distributer, subscriber
+
+-> initially publisher will publish the publications, publications contains the articles
+-> replication will run based on the agents
+-> if we observed while installing the sql server one folder will be created name called repl data
+
+
+In subscriber we have 2 types of mode
+1. push subscription
+2. pull subscription	
+
+push means that deliver to the door step
+pull means you to go out and buy the news
+
+
+---------> we have 4 types of replications or publications
+1. snapshot replication
+2. transaction replication
+3. merge replication
+4. peer to peer replication
+
+
+1. in snapshot replication it will take sanpshot of marked or specific tables we are marked
+
+now snap-shot will take the snapshot of table and stored into the repli-data folder
+
+now we have the challenge with snap shot
+imp*****-> in sanp shot agent every time it will take backup of tables which marked and send to the subscriber while replication, it will drop whole objects in the subscriber and it will create re-create objects as per the new publication
+
+in replication you can read subscriber data means secondary reader
+
+replication works on jobs
+
+--> pre-req for snap-shot replication
+
+1. distributor
+2. publisher
+3. subscriber
+
+
+Demo--> first we have to configure the Distrubtor Agent, once the distributed agent is added there might be some changes in systemdb another distribution added to system db
+
+2. now create the new publication
+3. now create the new subscription
+
+we have monitor tools for publication--> launch the replication monitor
+
+we can create the subscriber on same server on another server
+
+we need to start the agent from monitor tool, we can see , publications, subscription watch list, and agent tabs
+
+
+-----now setup transaction replication--------------
+
+for transaction replication primary key is madidate
+
+Demo--> Now log reader comes into picture what we can marked to send to the distributor
+
+--> lets first create a table with primary key 
+--> now we will setup the transction replication
+
+---> only once we create the distributor
+
+--> go to replication --> new publication once added go to another server create a subscription
+
+transition replication will take immediate changes , also we can track the latency from publisher to distributor and distributor to subscription
+
+
