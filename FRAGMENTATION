@@ -1,0 +1,29 @@
+Fragmentation: pages can having a empty rows calld as fragmentation
+> How to find whether pages are fragmented or not?
+Upto SQL SEREVR 2000 version: DBCC SHOWCONTIG
+From Sql 2005 onwards: DMV's to find
+Select * from sys.dm_db_index_physical_stats (DB_ID (‘DB NAME’), Object_id (‘tablename’),
+NULL, NULL, ‘Detailed’)
+Column to verify the fragmentation value:
+
+
+Avg_fragementaion_in_pernt:
+>0 to <5: Indexes are good and no fragmentation .No action required.
+>5 and <30: Reorganize the index
+>30: Rebuild the index
+
+
+> How reduce fragmentation?
+By either rebuild or reorganize the index.
+
+
+ FRAGEMENTATION TYPES
+1. Internal Fragmentation: Index pages takes more pages than needed. Data stored in pages in
+improper order.
+2. External Fragmentation: Occurs when pages are not continuous on Extent.
+
+DIFF BETWEEN REBUILD AND REORGANIZE:
+REORGANIZE: Internally the data gets rearranged inside the data pages and no effect to existing
+indexes.
+Alter INDEX INDEXNAME ON TABELNAME REORGANIZE
+
