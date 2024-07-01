@@ -1,0 +1,19 @@
+/3GB SWITCH:
+> By default SQL Server can be able to utilize 2 GB max memory in 32-bit o/s.
+> If required to use SQL Server more than 2 GB [Max 3 GB] then recommended to enable /3GB
+switch in BOOT.INI file
+
+WAITING TYPES
+
+> When if any query waiting for resources then relevant wait type comes into picture. Which
+cause high performance impact.
+How to find wait type:
+Select * from sys.sysprocesses
+Column “last wait type"
+
+Types of wait types:
+• LCK_M_S: Occurs when a task is waiting to acquire a shared lock. [Occurs mostly in
+blockings]
+• ASYNC_IO_COMPLETION: Occurs when a task is waiting for I/Os to finish.
+• ASYNC_NETWORK_IO: Occurs on network writes when the task is blocked behind the
+network. Verify that the client is processing data from the server.
