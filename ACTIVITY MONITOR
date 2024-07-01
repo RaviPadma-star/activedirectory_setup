@@ -1,0 +1,33 @@
+> Activity monitor is used to get the information about users connections to the database
+engine and the locks that they hold. Activity monitor is used to troubleshooting database
+locking issues, and to terminate deadlocked or unresponsive process.
+
+> To use activity monitor: VIEW SERVER STATE permission on server and SELECT permission to
+the sysprocesses & syslocks tables in the master database.
+> To kill process: Sysadmin and processadmin database roles and permissions are required to
+KILL a process.
+This snapshot is very helpful to get a quick performance snapshot without the need to use other
+monitoring tool for the same purpose.
+
+% Processor Time – is the percentage of time the processors spend to execute threads that are
+not idle
+Waiting Tasks – is the number of tasks that are waiting for processor, I/O, or memory to be
+released so the tasks can be processed
+Database I/O – is the data transfer rate in MB/s from memory to disk, disk to memory, or disk
+to disk
+Batch Requests/sec – is the number of SQL Server batches received by the instance in a second
+
+
+
+The Processes pane:
+> The Processes pane shows the information about the currently running processes on the SQL
+databases, who runs them, and from which application
+Session ID – is a unique value assigned by Database Engine to every user connection. This is
+the spid value returned by the sp_who procedure
+User Process – 1 for user processes, 0 for system processes. The default filter is set to 1, so only
+user processes are shown
+Login – the SQL Server login that runs the session
+Database – the database name on which the process is running
+Task State – the task state, blank for tasks in the runnable and sleeping state. The value can also
+be obtained using the sys.dm_os_tasks view, as the task_state column. The states returned can
+
