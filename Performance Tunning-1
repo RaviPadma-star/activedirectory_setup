@@ -279,4 +279,145 @@ covering index: interview --> in the non-clusterd index if we cover all the colu
 that means what will will define the freee space in zero means its disabled
 --> we will use 100% percentage-> ok if index page 100% full it will create execussive split, if excessive splits are there, they are going to degrade the performance issue, the idle values I 80%--> it will occupy 800% remaining 20% will be free only on index page not data pages --> this is the post installation steps
 
+ola-hallengren.com is famous for mainaance jobs
+
+fragmentation:
+
+Generally we have index rebuilding -- index-re-orgnising,, why we have to index re-organizing, hen we will go for rebuild of index
+
+index-rebuild and index-re-organization also imp
+
+--> so this also maintance job run for every week or everyday, update statictics
+
+--> so you should know the concept of fragamentation
+
+--> the empty space that gets formed when huge modification occus on index page
+--> ntg but if you delete the huge records from table
+
+--> the problem with fragmentation, when the table is loading it will still load with empty spaces-- the pointer will read the empty space also, even though no records on table, sql server read the records of empty spaces
+
+--> imagine, we adjust the empty space is called fragmentation
+
+--> fix the fragmentation
+--> fragmentation is not good.
+--> to check fragmentation using dbcc commands or use some custome scripts for fragmentation
+
+--> how to fix fragmention
+	--> we have index re-build, it will remove all the empty space and it will re-arrange all the records based on the index key --> that why every week organization run index -rebuild all index re-organization
+
+--> go -to instance --advdb -new query
+cmd: dbcc showcontig
+
+lets google --> script to check the fragmentation in sql server
+query
+
+--fragmentation is bad, as we know for performance issue
+
+--> how to fix --fragmentation
+	solution: there are 2 ways it depends upon on the fragmentation level-percentage
+if you see fragmentation more than 30%, then you have to go for index-rebuild
+
+-- if fragmentation is 10 to 30% then you have to re-index -re-org
+
+-- if it is less than 5% just ignore it
+
+--> how to create index-rebuild jobs
+	--> index-rebuild -non -business hours these are down time activity, because it will drop the index and re-create index
+
+how to do index-rebuild --> go to db-any table --> indexes -> select clustered one -right click- on -re-build
+select on-line --> ok, I have done for one table in the db, this wil apply the same for all tables inside the database
+--> if you want re-organize, see in properties only--> ok
+
+-- the same you want to multiple db, we use maintaince plan
+--> go to management --> maintance plan-> new-> name- idex-rebuild
+
+--> from left side--tool ba-check-rebuild index task--> drag and drop it now we have to configure this--double click--> choose the db --> check ignore ok, in down below we can see --optimize index only if options --> after configure-- on above we can see the scgedule, options --once competed we have save-- we can also add subplan as - index-re-organization task from toolbar-dobe clck and schedule --save
+
+--> if you run, on any db 
+--> dbcc check db
+ --> it will show any allocation error or consistency error are there in the output, if it shows in red color means the db is corrupted guys
+
+if error on down below
+checkdb found 0 allocation error and 0 consistency error means, the db is healty --> to see the integrity of db we set up checkdb jobs
+
+--> create a new subplan, for dbcc, checkdbb
+it will only run - non-business because time consistency--from toolbar-check database integrity task-drag-and-drop --double click to setup--all-db check igore - check inckude indexes - check pshysci only--ok -> save -schedule - some maintance run on Saturday, don't do every jobs on sunday--save
+
+-- some of them are deploye, ola-hallengram scripts
+
+--> some of checkdb jobs will failed because of space issues
+
+the other components, that will effect the performance is update-statistics
+
+what is statistics --> kind of object, in the sql server, statisitics generally define the meta-data of the table
+
+-- if some one came and asking you, this query is fine till yesterday, from today the query running is very slow, what you have to do, ntg go and run update statices immediately, this is not a downtime activity, we can run on whole server level, you can run on db level on the single table also
+
+--> ask the query or you can use sp_whoisactive, pull the query, you can see what and tables included in the query, go to the database, go to tables, I expand tables we can see-statices--> we can see option --right click-properties-- wizard check update statics--> ok
+
+--> we don't create any statices, based on the tables, sql server, automatically create statices
+
+--> will create the update statices--toolbar --update-> scheduke =save -ok
+
+
+performance factoring:
+
+cpu-utilization
+memory 
+blocking
+free space drives
+maintence jobs like index rebuild, index re-organization and update statistics jobs are running successfully or not
+
+-- dbcc ceckdb
+--> server configuration loke, ctp, maxdop, mx server, memory index, fill factor, fragmentation, disabled indexes, how to enable indexes -> options there is no enable button, we should re-build --> ggogle-script to find the disabled in sql server
+
+--> some times-- compatibility of db create the performance issue
+
+try to change the compatibility of db, instance-db-properies-> options-computability level
+
+--> preferred owners--> on cluster level, can performance issue
+
+
+lets dicuss about the tempdb contention:
+	--> generally, mp of temp it ill used for temp process, tempdb--> keeps tempdata files and logfiles ina sepeate drive is recommended
+
+--> add the data files based on the cpu cores to the temp db
+--> if 2 coes are there 2 data files should be there for tempdb
+
+--> go to instance --sysemdb--tempdb-properties
+files
+- how many data files add to tempdb--> 32767 upto 8 we can add based on server cpu core
+
+--> some time temodb will be full, what we do --> how to truble shoot this issue
+
+--> tempdb is noting but collection of log file and data files
+--> in what secenerio we do shrinking 
+	--> shrinking: user database logfile
+			user database datafile
+			tempdb data and logfile
+user database log file:
+--> DBCC sqlperf(logspace) --> this cmd helps to find all db of log size and logspace used
+
+--> how to shrink -> to go the db -> right click-task-shrink-files-choose only which file you want shrink-- file type -> log -> select check re-organize
+
+--cmd --> select name, log_reuse-wait_desc from sys.database -> y the log space is utilizing -> ntg, logbackup, means you have to take logbackup for specific db, active backup, restore, active transaction
+
+--> some time --> it shows, log shipping always on means there is no sync is not working properly meams, we havve to fix the issue then we have to shrink the files
+
+--> if data file is full, we don't shrinhk the data files, then how to fix --> add the new file in the drive or extended the drive
+
+--> tempdb--you can shrink, data files and logfiles --> tempdb--tasks-shrinks-files
+
+--> in case after shrinking also it not releasing the space means what we do --> cmd before restarting we run this command
+	--> choose for only tempdb
+	--> DBCC freeproccache
+	--> DBCC freesystemcache
+	--> DBCC dropcleanbuffers
+	--> DBCC freesessioncache
+	--> check point
+
+	--> select while executing tempdb, in execution plan top-left corner dropdown
+
+	--> last option restart the sql server, means it will re-create the tempdb
+
 
