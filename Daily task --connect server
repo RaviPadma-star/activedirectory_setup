@@ -1,0 +1,16 @@
+1. unable to connect the server
+if server or services is in stopped state we get erro 1225
+if you gave wrong server name --> error 67 or 
+
+how to fix:
+1. one is maje sure sql services are running or not
+check tthe server name properly
+check tcp/ip is enabled or not
+check browser services up and running or not
+missing spn - active directory, you check with windows team, windows team will register new spn in ad
+-- event viewwer - windows machine (app logs)
+- tcp/ip enable --> sql server--properties-ip-address-tcp port apply-restart
+cmd -eventvwr
+
+-- login failed - 18456 error
+check server sql server logs
