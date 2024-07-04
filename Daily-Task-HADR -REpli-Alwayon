@@ -1,0 +1,69 @@
+Replication: Replicate the articles between the publisher and suscriber
+  we called server as 
+  --> publisher
+  distributer
+  subscriber
+
+  replication wiil be run based on the agents and jobs
+  --> snap shot agent
+  --> log reader agent
+  --> Distributer agent
+  --> merge agent
+
+  --> how to monitor using via distributor replication
+  --> go to instance --> replication right click-> launch replication monitor
+  --> if you see not sync option right click and astart
+
+  agent-- right click on agents view details
+  -- agent profile
+
+  --> how to get latency on transaction replication--> traces tokens tab insert traces
+  --> what is trace tokens
+      carefully while starting the snapshot agents
+  --> some times we get request for addig artices in replication
+  --> instance -replication -> in which reolication you have to add articles for ex: snapshot replication right click properties --articles tab --go to secondary check wheather the artickes are added or not, it will not add
+  immeaditely because snapshot is a scheduled --> if you want immeadetaily effect means  go to monitor- select snapshot agents simply run the agents
+--> if you want add article to transaction replica the mandotory this -- primary key
+  --ill use import and export method to move the table to one and another table
+
+
+  CLustering:
+  in cluster we called as primarynode and secondary node --
+  for errors -- if we want need to see cluster events and information details
+  --> evetn viewer-- eventvwr
+  how many ip address are need to configure clustering
+  shout out questins: how many nodes and application  2n + 1 
+
+  node 1 public and private ip
+  node 2 public and private ip
+  1 windows cluster ip
+  1 sql cluster ip
+
+
+  ALWAYS ON:
+  --> HOW TO ADD A NEW DB ag
+  LETS CREATE the table, if you want add to ag
+-- meet the conditions:
+  1.db should be full recovvery mode
+  2. take full backup
+   go to availibilty databse- right click add db -- take the full backup, which db you want add, take the log backup of db as well
+
+  --> some time in ag, db suspended kind of this
+-->how can i track--> click on alwayson--right click- show dashboard we can see wizard, click on error view always on health checks -- latest error will be bottom
+  -> now go to susoended databse rgiht click - resume data movements
+
+  some times we get request for refresh db: for ag groups
+  ________________________________________________________
+
+  step 1:  remove db from Ag, script out the permsioon, restore full backuo on primary replica, which we taken from the production server
+  -- then imagine , 2  secondary server replicas are there -> then again take the full and log backup of primary db
+  then restore the all permissions
+  then take  full backup, log backuo and log backup primary server after resoring the permissons
+    -> restore with no recovery in all secondary replicas
+    --> then add db base to ag setup
+
+    --> now customer is asking give permission on a tbale on database:
+    --> go to instance -- securtiy logins- to give access -- first of all i have to creatre the login- new login- sql password
+    i want make karthik sys-admins go to server roles - sysadmins
+    --> you want to give permission on db level then go ti user mapping, here select which databse you want and what kind of db role ex: data_writer
+      --> if some one account is locaked how to unlock--> go to login-> select login name--> double click-- stauts-tab- sql server auth--> uncheck 
