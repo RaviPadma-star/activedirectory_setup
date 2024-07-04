@@ -1,0 +1,60 @@
+Under sql server agent --
+jobds
+
+-- in case any job is failed, in the middle week or day, dont run, some times we can run, some time not
+if its failed, to run the job take approvals
+we see history of job-any-job-click -view history
+if you see duration, if it is time consumed more dont run, if it is less time we can run it, if it is mandatory, take approvals
+imagine-- one job is failed on full backup, 99 backup are success, but one is failed due to space issue, we have to fix the space issue, first than take only failed backup db, headache, so the backuo is sccuess, 
+no pressure on server
+--> if job are failed because of sa, make sure solution is make sure, the job owner is sa -- job properties --> owner sa--ok
+
+Maintance plan
+
+--> if you run -- execute --failure, make sure view history
+
+--> Data files full, log file full, tempdb ful
+--> how track these issues
+-- usally we have monitoring tool, to moinitor the sql server, solor winds, third party tools
+
+-- native tools --> using sql server
+--> using windows server
+--> scom alerts
+
+-- if ot is a data file, can we shrink--no 
+-- what to do
+--> how to do --> extended the drive, connect with storage team --raise the ticket
+
+--> if the drive includes --data and log files and other files, try to shrink other files 
+
+--> if you shrink also-- do it or non-business hours if the fress space, reclaim morre than 20% then do it
+
+--> or request the storage team, extend or they gone add, a new drive
+
+--> once they added a anew drive
+--> if they added new drive whole drive is full -- go to db --> clcik-- properties files -> ass -- file name ass f2 before adding we have to cap the old data files--> how to do that,
+click on auto growth- section-- disabled the auto growth of first data files--which is full --ok
+
+
+NExt Log file full issue:
+Error: 1105 if data file is full --> sql server log
+error: 9002-- for log file full -- if you see in sql server log --> you shrink the log file has much as you can-- how to check it --> dbcc sqlperf(logspace)
+--> which db is taking more storage if 99% is used by any database
+select name, log_reuse_wait_desc from sys.database
+if you see nothing, you can happily shrink the log files
+we can see some of state as noting  --> log backup, active backup or restore, avalibilty replicas --> check the ag group is sync or not, checkpoint, oldestpage
+
+if active trasaction is there is output, you should wait for sometimes, try to shrink other db untill --> wait for sometime, if there i snow as the drive completely full then kill the section with approvals
+--> if you see log backup -- you take the og backup--then only you try to shrink
+--> if checkpoint is there -> just execute the cmd-- checkpoint, make sure you selecte the location db as af=dventure in top left corner
+--> if oldest page means, you to run again checkpoint cmd
+
+--> writing of the data files fro log to data files, to store permemntaly is known as checkpoint --> checkpoints will ove the files from log to data files
+--> checkpoints, may write the data from log to datafile- automatic checkpoint run on every database
+
+
+What if my tempdb is full --> 
+-- if your tempdb is full, if active transaction are running, you can shrink but it wont realease the unused spcae, before shrinking datafiles, you have to check any active trasactions are there or not
+-- sp_whoisactive
+--> if active trasction are running just wait for it untill, if there is no way you have to shrink it, then kill the session take approvals
+--> how to shrink -> tempdb -right click--task shrink files--> files name- temp2--> re-oragnize-- scriptout, if final case, restart the sql server
