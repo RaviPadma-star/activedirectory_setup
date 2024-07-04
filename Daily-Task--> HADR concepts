@@ -1,0 +1,62 @@
+soem times we will get -- requesrse to execte the scripts -- what precautions we must take
+1. Dont execute without chage request (these will be fully approval)
+2.check how many scripts are there or folder script1, scripts2,  scripts3
+
+in this folder scripts, roll back scripts also will be there-- dont run all the scripts
+
+-- how to identify --> in the begining id scripts
+RB_scripts
+Scripts_Rb
+
+--> if you copying the scripts from google, just be cautions execute first on non -prod server
+
+--> devoplers very crazy dont listen those words
+
+Log shipping concept:
+How to monitor the log shipping
+one way is atandard report
+
+--> in what cases log shipping will be broken
+--> space issues
+any one took log backup manually the lsn will be miss match
+-> if your ahent is down job cant run right
+
+--> how to monitor--> go to the primary server-- right click reports --> standard reports tranaction log shipping-status
+--> using msdb log shipping tables-- in primary or secondary log shipping tables will be there 10, 100, table log table will be there-- system db-msdb
+--> your job history, copy job history, copy restore history
+
+How to failover the log-shipping
+--> before failover -- you have run all jobs manaually  --> backup job, copyjob, restore job
+
+after running jsut disable this job --> backup job
+
+--> now on secondary server, bring -db online --> resore databse logshipping with recovery
+--> once came online --> inform app team, to change the connection giving to secondary server
+
+How to patch Hadr --> before
+log shipping, mirroring, replication, clustering alwayson
+--> before patching check this
+
+steps : 1 first you have to test the failover
+--> failover to secondary to primay
+2 --> patch secondary server first
+failover to the patch node
+then patach recent secondary node
+then failback to previous state
+
+How to monitor mirror server
+---------------------------
+
+Mirror server--> principal server
+            --> mirror server 
+
+how to monitor :  select the mirror db - right click task--> launch database mirroring monitor
+
+query: select * from sys.database_mirroringonly
+we can see output
+--> we can restart the endpoints, most of issues
+--> restart the end points  -> select * from sys.endpoints
+
+--> after endpoint mirroring state = stopped 
+
+how to failover : select mirror db - right click properties--> mirror tab clcik on failover button
