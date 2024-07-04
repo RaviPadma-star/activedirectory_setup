@@ -1,0 +1,60 @@
+there is user and systm db, where the mdf and ldf are stored in disk for ex:
+Data file is stored in B drive
+log file is stored in c drve
+so while databse size is growing, the disk allocation size more, there is chance of disk full, it means when one db files growing
+anousmaly, there is chance of ohter may go to offline, because ll databfiles are stores in single disk, in this situation, which db is growing fast we can move to another drive
+--> how to do --> copy the data file which db is taking more
+--> moving user databse from one drive to another drive with the help if sp_helofile  --> we can see the path
+-> deaatch the db from ssql server
+--> move the file from 1 dirve to another drive
+--> attach the db by pointing the data and logfile from new location
+--> attach from-- go to instance data base -- right clcik- attach
+--> make sure that thte folder have the neceesary permission for read and write
+
+Move System DAtabse:
+-> msdb --> moving sdb db 
+--> use msdb, sp_helpfile, stop the service where services configuration manager
+--> before stopping services , run the alter query
+cmd--> alter database msdb modifyfile(name=msdbdata, filename='Newpath where you want move\msdb.mdf)
+alter database msdb modify file (name=msdblog, filename='pathname\msdblog.ldf)  -- execute this cmd, this is used to tell the sql server that when ever restarting the services, read the file from this path
+--> move --> means stop the service
+--> now copy the msdb, datafile and log file, psate into the new location, then start the seervice from confugartion manager, sp_helpfile, if msdb gone to recovery pending, then again, stop the services, 
+move the files from old location to new location maually
+start the service
+--> if task is in-succesfull, then proceeed with the rollback process,
+rollback: stop the services and move nack to files to old location
+
+msdb and model process is same above
+
+for master and tempdb is process is little different:
+temp db process: moving tempdb from one to another drive:
+use tempdb
+sp_helpfile
+run the alter queryfile
+
+alter databse temodb modifyfile(name=tempdb, filename='pathname\tempdb.mdf)
+-- same repeat the process for all tempdb files
+
+executet
+the restart the services
+
+Moving master database:
+-- use master
+sp_helpfile
+--> go to the service configuration manager
+slect which server- right click properties, go to startup, parameter tab, we can see some existing paths
+
+-d measns -- data file path
+-l means --log file path
+-e mans --error file
+
+-- for we replace the new path with exising path in parameter tab
+specifing a startup parameter
+new path = -IE:\movedatabse\mastlog.ldf -> click uodate button
+again update the mdf file
+-dE:\movedatabse\master.mdf
+
+stop the sql servers
+--move the files from old to new location 
+-- start the services
+
