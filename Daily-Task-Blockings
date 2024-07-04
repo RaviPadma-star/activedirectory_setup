@@ -1,0 +1,14 @@
+i want to see parallel user, how many are connectes server--task manager --> users
+
+Blockings--> Tables.sales
+Ravi is trying to insert some records - 69
+karthik is trying to insering some records at the same time
+
+--> blockings are very somman
+90% percents are auto fixed
+10% session are blocking
+to find the blockings --> select * from sys.sysprocess where blocked <> 0
+
+Scripts to generate blockings
+--> scripts to find lead blockers
+
