@@ -1,0 +1,49 @@
+Backups and restore:
+new - query --> backup database adventures to disk = ' ad_full.bak'
+
+--> backup database adv to disk = 'adv_diff.bak' with differentail
+--> backup log adv to disk = 'adv_log.trn'
+
+once you changed the simple to full recovery model , we need to take the full backup to apply the new recovery model
+
+-- copy-on-backup
+-- backup database adv to disk = 'adv.bak' with copy_only
+
+Restore - fulll, diff, log -- serial only
+imagine you have t10 logs backups- you have to restore with serial order
+
+-- database - restore -device
+  options check overite with database name for same database name
+--check logs for error -- sql server logs
+--> event viewer
+
+
+Database refresh task:
+--> refresh the database restore the db only
+-- we take the backup of prod_db imagine sales
+
+---> non prod restore in the non prod is called referesh db
+
+--> prod sales (ravi, karthik) has access on producation db
+
+-- for non prod server (karthik) has only here aceess --> old permission or gone they are overwritten
+-- before restoring hte db
+steps: go to nin prod take the permissions backup -- before restoring
+restore the db from prod
+resore the permission from step 1
+
+live---> login --> new login for ravi karthik
+before doing the db take the user persmiison scripts --> on non prod-server
+
+open new query with advwork -- execute the scripts copy the output 
+now restore the db 
+
+now check with logins, it cant access the db because logins are missing 
+now we have copied the output of user permisson scripts-- copyoutput
+go to the server again , open new query paste the scripts--> run --refresh the db
+now we able to access the db
+
+-- in production only backup, other think you have to do on non-prod server
+
+
+
