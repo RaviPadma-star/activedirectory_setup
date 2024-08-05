@@ -1,0 +1,16 @@
+A checkpoint in sql server is a process that helps maintiane the performance and recovery of a database 
+
+1. writes dirty pages --> pages that have been modified in memeroy, but not yet written to disk are flushed to disk , this helps to ensume that the most recent changes are saved
+to disk and it can be recovered in the event of a failure
+2. updates transaction log --> the tranasction log is updated to reflect the changes made on the database
+3. Truncate the log : un needed log records are removed from the logfile. freeing up space and  improving the peroformance
+
+checkpoint: when a new row inserted or updated in the databse , the sql server database engnine will keep the changes in buffer pool, with out applaying directly on database files
+
+this data pages are located in the buffer pool, and not yet reflected to db files are called diry pages 
+
+the sql server engine uses the speacila operation to writes the dirty pages to the data and log datafiles  these process are called checkpoints
+
+how to run manuall checkpoint 
+
+--> https://www.sqlshack.com/sql-server-checkpoint-lazy-writer-eager-writer-and-dirty-pages-in-sql-server/#:~:text=We%20can%20use%20the%20undocumented,event%20in%20the%20current%20database.&text=It%20gives%20the%20details%20of,information%20in%20the%20error%20log.
